@@ -1,0 +1,36 @@
+/* Pa'Biritta — gaya kustom pelengkap Tailwind */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Garis batas line-clamp manual (kompatibel browser lama) */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Marker khusus di peta */
+.marker-sensor {
+  background: #DC2626;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(220,38,38,0.3);
+}
+.marker-sensor.waspada { background: #EAB308; box-shadow: 0 0 0 2px rgba(234,179,8,0.3); }
+.marker-sensor.bahaya { background: #B91C1C; box-shadow: 0 0 0 4px rgba(185,28,28,0.4); }
+
+/* Leaflet popup tweak */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
