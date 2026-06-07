@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %} | Pa'Biritta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: { DEFAULT: '#DC2626', dark: '#B91C1C', light: '#FEE2E2' },
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+
+<div class="flex min-h-screen">
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="hidden md:flex md:w-72 bg-gradient-to-b from-primary-dark to-red-900 text-white flex-col fixed inset-y-0 left-0 z-40 md:relative">
+    <div class="p-6 border-b border-red-800/50">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
+          <span class="text-primary font-bold text-2xl">P</span>
+        </div>
+        <div>
+          <div class="font-bold text-lg">Pa'<span class="text-red-200">Biritta</span></div>
+          <div class="text-xs text-red-200">Desa Tangguh Bencana</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-1">
+      <div class="text-xs uppercase text-red-200/70 px-3 py-2">Menu Utama</div>
+      {% set ep = request.endpoint %}
+      <a href="{{ url_for('admin.dashboard') }}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg {% if ep == 'admin.dashboard' %}bg-primary{% else %}hover:bg-red-800/50{% endif %}">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+      <a href="{{ url_for('admin.manajemen_laporan') }}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg {% if ep in ['admin.manajemen_laporan','admin.detail_laporan'] %}bg-primary{% else %}hover:bg-red-800/50{% endif %}">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Manajemen Laporan
+      </a>
+      {% if current_user.is_superadmin %}
+      <a href="{{ url_for('admin.manajemen_pengguna') }}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg {% if ep == 'admin.manajemen_pengguna' %}bg-primary{% else %}hover:bg-red-800/50{% endif %}">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        Manajemen Pengguna
+      </a>
+      {% endif %}
+    </nav>
+
+    <div class="p-4 border-t border-red-800/50 space-y-3">
+      <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-800/50 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Keluar Sistem
+      </a>
+      <div class="bg-yellow-50/10 border border-yellow-300/30 rounded-lg p-3">
+        <div class="flex items-center gap-2 text-yellow-200 text-xs font-semibold mb-2">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"/></svg>
+          Status Desa
+        </div>
+        <div class="bg-{{ status_desa.warna }}-600 text-white text-center font-bold py-2 rounded text-sm">
+          {{ status_desa.status_text }}
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+      <div class="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button id="sidebar-toggle" class="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold">{% block page_title %}Dashboard Admin{% endblock %}</h1>
+            <p class="text-xs text-gray-500 hidden sm:block">{% block page_subtitle %}Ringkasan sistem manajemen kebencanaan desa{% endblock %}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 sm:gap-6">
+          <button class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+          </button>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
+              {{ current_user.nama[0]|upper }}
+            </div>
+            <div class="hidden sm:block">
+              <div class="text-sm font-semibold">{{ current_user.nama }}</div>
+              <div class="text-xs text-gray-500 capitalize">{{ current_user.role }}</div>
+            </div>
+          </div>
+          <a href="{{ url_for('auth.logout') }}" class="p-2 text-gray-600 hover:bg-gray-100 rounded-md" title="Logout">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="px-4 sm:px-6 lg:px-8 pt-4 space-y-2">
+          {% for category, msg in messages %}
+            {% set cls = {'success':'bg-green-50 text-green-800 border-green-200','error':'bg-red-50 text-red-800 border-red-200','warning':'bg-yellow-50 text-yellow-800 border-yellow-200'}.get(category,'bg-blue-50 text-blue-800 border-blue-200') %}
+            <div class="border rounded-lg px-4 py-3 text-sm {{ cls }}">{{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script>
+  document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('hidden');
+    sb.classList.toggle('flex');
+  });
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

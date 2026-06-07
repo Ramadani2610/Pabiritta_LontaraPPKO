@@ -1,0 +1,153 @@
+{% extends "base_public.html" %}
+{% block title %}Beranda{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+  <!-- HERO -->
+  <div class="relative bg-primary rounded-2xl overflow-hidden p-6 sm:p-10 text-white">
+    <div class="relative z-10 max-w-3xl">
+      <h1 class="text-2xl sm:text-4xl font-bold mb-3">Sistem Pemantauan Bencana Longsor</h1>
+      <p class="text-sm sm:text-base text-red-100 mb-6 max-w-2xl">
+        Platform partisipasi masyarakat untuk pelaporan dan pemantauan kondisi rawan longsor
+        di wilayah desa. Laporkan segera jika melihat potensi bahaya.
+      </p>
+      <a href="{{ url_for('laporan.buat') }}"
+         class="inline-flex bg-white text-primary font-semibold px-6 py-3 rounded-lg shadow hover:bg-red-50 transition">
+        Buat Laporan
+      </a>
+    </div>
+    <div class="absolute -right-10 -bottom-10 opacity-20 pointer-events-none">
+      <svg class="w-72 h-72" fill="white" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+    </div>
+  </div>
+
+  <!-- STATISTIK -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    {% set cards = [
+      ('Total Laporan', stats.total, 'blue', '📄'),
+      ('Sedang Diproses', stats.proses, 'yellow', '🕐'),
+      ('Selesai Ditangani', stats.selesai, 'green', '✓'),
+      ('Wilayah Rawan', stats.rawan|string + ' Titik', 'red', '⚠️'),
+    ] %}
+    {% for label, val, color, ic in cards %}
+    <div class="bg-white rounded-xl border border-gray-100 p-4 sm:p-5 flex justify-between items-start shadow-sm">
+      <div>
+        <div class="text-xs text-gray-500 mb-1">{{ label }}</div>
+        <div class="text-2xl sm:text-3xl font-bold">{{ val }}</div>
+      </div>
+      <div class="w-10 h-10 bg-{{ color }}-100 text-{{ color }}-600 rounded-lg flex items-center justify-center text-lg">{{ ic }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- PETA -->
+  <div class="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+    <div class="flex items-center gap-2 mb-4">
+      <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+      <h2 class="font-bold text-lg">Peta Digital Interaktif</h2>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div id="map-beranda" class="lg:col-span-3 h-[400px] sm:h-[500px] rounded-lg overflow-hidden border border-gray-200"></div>
+      <div class="space-y-4 text-sm">
+        <div>
+          <div class="font-semibold mb-2">Legenda</div>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-red-500/40 border-2 border-red-600"></span> Zona Rawan Longsor</li>
+            <li class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-orange-400/40 border-2 border-orange-500"></span> Zona Kemiringan Lereng</li>
+            <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span> Sensor IoT</li>
+            <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Persebaran Titik Longsor</li>
+            <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500"></span> Posko Siaga Bencana</li>
+            <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-gray-700"></span> Jalur Evakuasi</li>
+            <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Titik Kumpul</li>
+          </ul>
+        </div>
+        <div>
+          <div class="font-semibold mb-2">Layer</div>
+          <div class="space-y-2 text-xs">
+            <label class="flex items-center gap-2"><input type="checkbox" data-layer="zona" class="rounded text-primary"> Zona Rawan Longsor</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-layer="sensor" class="rounded text-primary" checked> Sensor IoT</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-layer="posko" class="rounded text-primary"> Posko Siaga Bencana</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-layer="laporan" class="rounded text-primary"> Persebaran titik longsor</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-layer="kemiringan" class="rounded text-primary"> Zona kemiringan lereng</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-layer="evakuasi" class="rounded text-primary"> Jalur evakuasi</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-layer="kumpul" class="rounded text-primary"> Titik Kumpul</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAPORAN TERBARU + STATUS DESA -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-4 sm:p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-lg">Laporan Terbaru</h2>
+        <a href="{{ url_for('laporan.daftar') }}" class="text-primary text-sm font-medium hover:underline">Lihat Semua →</a>
+      </div>
+      <div class="space-y-3">
+        {% for l in laporan_terbaru %}
+          <a href="{{ url_for('laporan.daftar') }}" class="flex gap-3 p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
+            {% if l.foto_url %}
+              <img src="{{ url_for('static', filename=l.foto_url) }}" class="w-16 h-16 rounded-lg object-cover bg-gray-100" alt="">
+            {% else %}
+              <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">📷</div>
+            {% endif %}
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between gap-2">
+                <h3 class="font-semibold truncate">{{ l.lokasi_label or l.dusun }}</h3>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-{{ l.status_color }}-100 text-{{ l.status_color }}-700 whitespace-nowrap">{{ l.status }}</span>
+              </div>
+              <div class="text-xs text-gray-500 mt-0.5">{{ l.kategori }} • {{ l.created_at|tgl('%-d/%-m/%Y') }}</div>
+              <p class="text-sm text-gray-600 mt-1 line-clamp-1">{{ l.deskripsi }}</p>
+            </div>
+          </a>
+        {% else %}
+          <div class="text-center py-12 text-gray-400">
+            <p>Belum ada laporan.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <!-- Status Kondisi Desa -->
+      <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm text-center">
+        <h2 class="font-bold text-lg mb-4 text-left">Status Kondisi Desa</h2>
+        <div class="relative w-36 h-36 mx-auto mb-4">
+          <div class="absolute inset-0 rounded-full border-[10px] border-{{ status_desa.warna }}-500"></div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <svg class="w-14 h-14 text-{{ status_desa.warna }}-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001z" clip-rule="evenodd"/></svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-{{ status_desa.warna }}-600 mb-2">{{ status_desa.label }}</div>
+        <p class="text-xs text-gray-500">{{ status_desa.deskripsi }}</p>
+      </div>
+
+      <!-- Kontak Darurat -->
+      <div class="bg-gray-900 rounded-xl p-6 text-white">
+        <div class="flex items-center gap-2 mb-4">
+          <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92z"/></svg>
+          <h2 class="font-bold">Kontak Darurat</h2>
+        </div>
+        <ul class="space-y-3 text-sm">
+          <li class="flex justify-between"><span class="text-gray-300">Posko Siaga Desa</span> <span class="text-primary font-semibold">0811-2233-4455</span></li>
+          <li class="flex justify-between"><span class="text-gray-300">BPBD Kabupaten</span> <span class="text-primary font-semibold">112</span></li>
+          <li class="flex justify-between"><span class="text-gray-300">Puskesmas</span> <span class="text-primary font-semibold">0822-3344-5566</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/peta.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const map = initPeta('map-beranda', { center: [-5.275, 119.488], zoom: 13 });
+    fetchAndRenderLayers(map);
+  });
+</script>
+{% endblock %}

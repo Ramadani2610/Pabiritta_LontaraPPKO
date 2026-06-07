@@ -1,0 +1,18 @@
+{% extends "base_admin.html" %}
+{% block title %}Dashboard Super Admin{% endblock %}
+{% block page_title %}Dashboard Super Admin{% endblock %}
+{% block page_subtitle %}Ringkasan sistem & manajemen pengguna{% endblock %}
+
+{% block content %}
+  {% include "admin/_dashboard_body.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/peta.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const map = initPeta('map-admin', { center: [-5.275, 119.488], zoom: 13 });
+    fetchAndRenderLayers(map);
+  });
+</script>
+{% endblock %}

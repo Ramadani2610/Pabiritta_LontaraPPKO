@@ -1,0 +1,221 @@
+{% extends "base_public.html" %}
+{% block title %}Buat Laporan{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold">Buat Laporan Aduan</h1>
+    <p class="text-gray-500 text-sm mt-1">Laporkan kejadian atau potensi longsor di sekitar Anda</p>
+  </div>
+
+  <!-- Stepper -->
+  <div class="flex justify-between items-center mb-8 relative">
+    <div class="absolute top-6 left-0 right-0 h-0.5 bg-gray-200 -z-0"></div>
+    <div id="stepper-progress" class="absolute top-6 left-0 h-0.5 bg-primary -z-0 transition-all" style="width:0%"></div>
+    {% for label, icon in [
+      ('Foto', '📷'),
+      ('Lokasi', '📍'),
+      ('Detail', '📄'),
+      ('Pelapor', '👤'),
+      ('Review', '✓'),
+    ] %}
+    <div class="flex flex-col items-center z-10" data-step-indicator="{{ loop.index }}">
+      <div class="w-12 h-12 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center text-gray-400 step-circle">{{ icon }}</div>
+      <div class="mt-2 text-xs text-gray-500 step-label">{{ label }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <form method="POST" enctype="multipart/form-data" id="form-laporan" class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- STEP 1: Foto -->
+    <section data-step="1">
+      <h2 class="text-lg font-bold mb-4">Bukti Foto</h2>
+      <label class="block border-2 border-dashed border-gray-300 rounded-xl py-12 text-center cursor-pointer hover:border-primary transition">
+        <div id="foto-preview" class="hidden mb-4">
+          <img id="foto-img" class="max-h-64 mx-auto rounded-lg" />
+        </div>
+        <div id="foto-placeholder">
+          <div class="w-14 h-14 mx-auto mb-3 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          </div>
+          <p class="font-medium text-gray-700">Klik untuk unggah atau ambil foto</p>
+          <p class="text-xs text-gray-400 mt-1">Maksimal ukuran file 5MB (JPG, PNG)</p>
+        </div>
+        <input type="file" name="foto" id="input-foto" accept="image/jpeg,image/png" class="hidden">
+      </label>
+    </section>
+
+    <!-- STEP 2: Lokasi -->
+    <section data-step="2" class="hidden">
+      <h2 class="text-lg font-bold mb-4">Lokasi Kejadian</h2>
+      <label class="block text-sm font-medium mb-2">Pilih titik di peta atau ketik label lokasi</label>
+      <input type="text" name="lokasi_label" placeholder="Contoh: Jl. Poros Desa, Dekat Jembatan"
+             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary mb-4"
+             value="{{ form.lokasi_label or '' }}">
+      <div id="map-pilih" class="h-80 rounded-lg border border-gray-200 mb-3"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <input type="text" name="latitude" id="lat-field" placeholder="Latitude" required
+               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-sm" value="{{ form.latitude or '' }}">
+        <input type="text" name="longitude" id="lng-field" placeholder="Longitude" required
+               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-sm" value="{{ form.longitude or '' }}">
+      </div>
+    </section>
+
+    <!-- STEP 3: Detail -->
+    <section data-step="3" class="hidden">
+      <h2 class="text-lg font-bold mb-4">Detail Kejadian</h2>
+      <label class="block text-sm font-medium mb-2">Kategori Laporan</label>
+      <select name="kategori" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg mb-4">
+        <option value="">-- Pilih Kategori --</option>
+        {% for k in ['Potensi Longsor','Kejadian Longsor','Dampak Longsor'] %}
+          <option value="{{ k }}" {% if form.kategori == k %}selected{% endif %}>{{ k }}</option>
+        {% endfor %}
+      </select>
+      <label class="block text-sm font-medium mb-2">Deskripsi Kejadian</label>
+      <textarea name="deskripsi" rows="5" required
+                placeholder="Jelaskan kondisi yang Anda lihat..."
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">{{ form.deskripsi or '' }}</textarea>
+    </section>
+
+    <!-- STEP 4: Pelapor -->
+    <section data-step="4" class="hidden">
+      <h2 class="text-lg font-bold mb-4">Informasi Pelapor</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Nama Lengkap</label>
+          <input type="text" name="nama_pelapor" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg" value="{{ form.nama_pelapor or '' }}">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Dusun</label>
+          <select name="dusun" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg">
+            <option value="">-- Pilih Dusun --</option>
+            {% for d in ['Tombongi','Galesong','Kampung Beru','Bontoloe'] %}
+              <option value="{{ d }}" {% if form.dusun == d %}selected{% endif %}>Dusun {{ d }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">No. HP (opsional)</label>
+          <input type="tel" name="no_hp" placeholder="08xx-xxxx-xxxx" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg" value="{{ form.no_hp or '' }}">
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 5: Review -->
+    <section data-step="5" class="hidden">
+      <h2 class="text-lg font-bold mb-4">Review Laporan</h2>
+      <div id="review-content" class="space-y-3 text-sm bg-gray-50 rounded-lg p-4">
+        <p class="text-gray-500">Periksa kembali laporan Anda sebelum dikirim.</p>
+      </div>
+      <p class="mt-4 text-xs text-gray-500">Dengan mengirim, Anda menyetujui bahwa informasi yang diberikan benar.</p>
+    </section>
+
+    <!-- Navigation -->
+    <div class="flex justify-between items-center mt-8 pt-6 border-t">
+      <button type="button" id="btn-prev"
+              class="px-6 py-2.5 rounded-lg bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 disabled:opacity-50" disabled>Sebelumnya</button>
+      <button type="button" id="btn-next"
+              class="px-6 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark">Selanjutnya</button>
+      <button type="submit" id="btn-submit"
+              class="hidden px-6 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark">Kirim Laporan</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const TOTAL_STEPS = 5;
+  let currentStep = 1;
+
+  function updateStepper() {
+    document.querySelectorAll('[data-step]').forEach(s => {
+      s.classList.toggle('hidden', parseInt(s.dataset.step) !== currentStep);
+    });
+    document.querySelectorAll('[data-step-indicator]').forEach(ind => {
+      const n = parseInt(ind.dataset.stepIndicator);
+      const circle = ind.querySelector('.step-circle');
+      const label = ind.querySelector('.step-label');
+      if (n < currentStep) {
+        circle.className = 'w-12 h-12 rounded-full bg-primary border-2 border-primary text-white flex items-center justify-center step-circle';
+        label.className = 'mt-2 text-xs text-primary font-medium step-label';
+      } else if (n === currentStep) {
+        circle.className = 'w-12 h-12 rounded-full bg-primary border-2 border-primary text-white flex items-center justify-center step-circle';
+        label.className = 'mt-2 text-xs text-primary font-semibold step-label';
+      } else {
+        circle.className = 'w-12 h-12 rounded-full bg-white border-2 border-gray-200 text-gray-400 flex items-center justify-center step-circle';
+        label.className = 'mt-2 text-xs text-gray-500 step-label';
+      }
+    });
+    const pct = ((currentStep - 1) / (TOTAL_STEPS - 1)) * 100;
+    document.getElementById('stepper-progress').style.width = pct + '%';
+    document.getElementById('btn-prev').disabled = currentStep === 1;
+    document.getElementById('btn-next').classList.toggle('hidden', currentStep === TOTAL_STEPS);
+    document.getElementById('btn-submit').classList.toggle('hidden', currentStep !== TOTAL_STEPS);
+    if (currentStep === 5) buildReview();
+    if (currentStep === 2) setTimeout(() => mapPilih.invalidateSize(), 100);
+  }
+
+  function buildReview() {
+    const f = document.forms['form-laporan'];
+    const data = {
+      'Lokasi': f.lokasi_label.value || '(tidak diisi)',
+      'Koordinat': (f.latitude.value || '-') + ', ' + (f.longitude.value || '-'),
+      'Kategori': f.kategori.value || '-',
+      'Deskripsi': f.deskripsi.value || '-',
+      'Nama Pelapor': f.nama_pelapor.value || '-',
+      'Dusun': f.dusun.value || '-',
+      'No. HP': f.no_hp.value || '-',
+    };
+    const html = Object.entries(data).map(([k,v]) =>
+      `<div class="flex justify-between border-b border-gray-200 py-2"><span class="font-medium text-gray-600">${k}</span><span class="text-right text-gray-800 max-w-xs truncate">${v}</span></div>`
+    ).join('');
+    document.getElementById('review-content').innerHTML = html;
+  }
+
+  document.getElementById('btn-next').addEventListener('click', () => {
+    if (currentStep < TOTAL_STEPS) { currentStep++; updateStepper(); }
+  });
+  document.getElementById('btn-prev').addEventListener('click', () => {
+    if (currentStep > 1) { currentStep--; updateStepper(); }
+  });
+
+  // Preview foto
+  document.getElementById('input-foto').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('foto-img').src = ev.target.result;
+      document.getElementById('foto-preview').classList.remove('hidden');
+      document.getElementById('foto-placeholder').classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Peta pilih lokasi
+  const mapPilih = L.map('map-pilih').setView([-5.275, 119.488], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(mapPilih);
+  let marker = null;
+  mapPilih.on('click', (e) => {
+    if (marker) marker.setLatLng(e.latlng);
+    else marker = L.marker(e.latlng).addTo(mapPilih);
+    document.getElementById('lat-field').value = e.latlng.lat.toFixed(6);
+    document.getElementById('lng-field').value = e.latlng.lng.toFixed(6);
+  });
+
+  // Init lokasi awal dari form (kalau ada)
+  const lat0 = document.getElementById('lat-field').value;
+  const lng0 = document.getElementById('lng-field').value;
+  if (lat0 && lng0) {
+    marker = L.marker([lat0, lng0]).addTo(mapPilih);
+    mapPilih.setView([lat0, lng0], 15);
+  }
+
+  updateStepper();
+</script>
+{% endblock %}

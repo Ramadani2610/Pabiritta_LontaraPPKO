@@ -1,0 +1,88 @@
+{% extends "base_admin.html" %}
+{% block title %}Detail Laporan #{{ laporan.id }}{% endblock %}
+{% block page_title %}Detail Laporan #{{ laporan.id }}{% endblock %}
+{% block page_subtitle %}{{ laporan.kategori }} • {{ laporan.created_at|tgl('%-d %B %Y') }}{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('admin.manajemen_laporan') }}" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary mb-4">← Kembali ke daftar</a>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- KIRI -->
+  <div class="lg:col-span-2 space-y-6">
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      {% if laporan.foto_url %}
+        <img src="{{ url_for('static', filename=laporan.foto_url) }}" class="w-full max-h-96 object-cover" alt="Foto laporan">
+      {% else %}
+        <div class="h-64 bg-gray-100 flex items-center justify-center text-gray-400 text-4xl">📷 Tidak ada foto</div>
+      {% endif %}
+      <div class="p-6">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="text-xs px-3 py-1 rounded-full bg-{{ laporan.kategori_color }}-100 text-{{ laporan.kategori_color }}-700 font-medium">{{ laporan.kategori }}</span>
+          <span class="text-xs px-3 py-1 rounded-full bg-{{ laporan.status_color }}-100 text-{{ laporan.status_color }}-700 font-medium">{{ laporan.status }}</span>
+        </div>
+        <h2 class="text-xl font-bold mb-2">{{ laporan.lokasi_label or ('Dusun ' + laporan.dusun) }}</h2>
+        <p class="text-gray-700 whitespace-pre-wrap">{{ laporan.deskripsi }}</p>
+
+        <dl class="mt-6 grid grid-cols-2 gap-x-6 gap-y-3 text-sm border-t pt-4">
+          <div><dt class="text-gray-500">Pelapor</dt><dd class="font-medium">{{ laporan.nama_pelapor }}</dd></div>
+          <div><dt class="text-gray-500">Dusun</dt><dd class="font-medium">Dusun {{ laporan.dusun }}</dd></div>
+          <div><dt class="text-gray-500">No. HP</dt><dd class="font-medium">{{ laporan.no_hp or '-' }}</dd></div>
+          <div><dt class="text-gray-500">Koordinat</dt><dd class="font-medium">{{ '%.5f, %.5f' % (laporan.latitude, laporan.longitude) }}</dd></div>
+          <div><dt class="text-gray-500">Dilaporkan</dt><dd class="font-medium">{{ laporan.created_at|tgl('%-d %b %Y, %H:%M') }}</dd></div>
+          <div><dt class="text-gray-500">Update terakhir</dt><dd class="font-medium">{{ laporan.updated_at|tgl('%-d %b %Y, %H:%M') }}</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+      <h3 class="font-bold mb-4">Lokasi di Peta</h3>
+      <div id="map-detail" class="h-72 rounded-lg border border-gray-200"></div>
+    </div>
+  </div>
+
+  <!-- KANAN -->
+  <div class="space-y-6">
+    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+      <h3 class="font-bold mb-4">Ubah Status & Tindak Lanjut</h3>
+      <form method="POST" action="{{ url_for('admin.ubah_status', laporan_id=laporan.id) }}" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div>
+          <label class="block text-sm font-medium mb-2">Status</label>
+          <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            {% for s in status_choices %}
+              <option value="{{ s }}" {% if laporan.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Catatan Admin</label>
+          <textarea name="catatan_admin" rows="4" placeholder="Catatan tindak lanjut..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg">{{ laporan.catatan_admin or '' }}</textarea>
+        </div>
+        <button class="w-full bg-primary text-white font-semibold py-2.5 rounded-lg hover:bg-primary-dark">Simpan Perubahan</button>
+      </form>
+    </div>
+
+    {% if laporan.catatan_admin %}
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+      <h4 class="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92z"/></svg>
+        Catatan Admin Saat Ini
+      </h4>
+      <p class="text-sm text-yellow-900 whitespace-pre-wrap">{{ laporan.catatan_admin }}</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const map = L.map('map-detail').setView([{{ laporan.latitude }}, {{ laporan.longitude }}], 16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+  L.marker([{{ laporan.latitude }}, {{ laporan.longitude }}]).addTo(map)
+    .bindPopup({{ (laporan.lokasi_label or laporan.dusun) | tojson }}).openPopup();
+</script>
+{% endblock %}
