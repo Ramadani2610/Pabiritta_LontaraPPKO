@@ -1,11 +1,8 @@
 """Blueprint laporan warga (buat & lihat daftar)."""
-import os
-import uuid
-from datetime import datetime
+import cloudinary.uploader
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, current_app
 )
-from werkzeug.utils import secure_filename
 from sqlalchemy import or_, desc
 
 from app import db
@@ -25,7 +22,6 @@ def _allowed_file(filename: str) -> bool:
 @laporan_bp.route("/buat", methods=["GET", "POST"])
 def buat():
     if request.method == "POST":
-        # Validasi field wajib
         kategori = request.form.get("kategori", "").strip()
         deskripsi = request.form.get("deskripsi", "").strip()
         lokasi_label = request.form.get("lokasi_label", "").strip() or None
@@ -51,19 +47,24 @@ def buat():
         if not dusun:
             errors.append("Dusun wajib diisi.")
 
-        # Upload foto
+        # Upload foto ke Cloudinary
         foto_url = None
         file = request.files.get("foto")
         if file and file.filename:
             if not _allowed_file(file.filename):
                 errors.append("Format foto harus JPG atau PNG.")
             else:
-                ext = file.filename.rsplit(".", 1)[1].lower()
-                fname = f"{uuid.uuid4().hex}.{ext}"
-                fname = secure_filename(fname)
-                fpath = os.path.join(current_app.config["UPLOAD_FOLDER"], fname)
-                file.save(fpath)
-                foto_url = f"uploads/{fname}"
+                try:
+                    result = cloudinary.uploader.upload(
+                        file,
+                        folder="pabiritta/laporan",
+                        allowed_formats=["jpg", "jpeg", "png"],
+                        quality="auto",
+                        fetch_format="auto",
+                    )
+                    foto_url = result["secure_url"]
+                except Exception:
+                    errors.append("Gagal mengunggah foto. Silakan coba lagi.")
 
         if errors:
             for e in errors:

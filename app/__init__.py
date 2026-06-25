@@ -1,5 +1,6 @@
 """App factory Pa'Biritta."""
 import os
+import cloudinary
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -22,6 +23,13 @@ def create_app(config_class=None):
 
     # Pastikan folder upload ada
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+    # Konfigurasi Cloudinary
+    cloudinary.config(
+        cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        api_key=os.environ.get("CLOUDINARY_API_KEY"),
+        api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+    )
 
     # Init extensions
     db.init_app(app)
@@ -72,8 +80,6 @@ def create_app(config_class=None):
     def server_error(e):
         return render_template("errors/500.html"), 500
 
-    # Jinja filter — strftime cross-platform. %-d / %-m tidak jalan di Windows,
-    # jadi kita render token sendiri.
     @app.template_filter("tgl")
     def _tgl_filter(value, fmt="%d %b %Y"):
         if value is None:
@@ -92,12 +98,10 @@ def create_app(config_class=None):
             "%B": value.strftime("%B"),
         }
         out = fmt
-        # Urutan: token yang lebih panjang dulu (%-d sebelum %d)
         for k in sorted(token_map.keys(), key=len, reverse=True):
             out = out.replace(k, token_map[k])
         return out
 
-    # Context processor — kirim status desa ke semua template
     @app.context_processor
     def inject_globals():
         from app.services.status_desa import hitung_status_desa
@@ -107,7 +111,6 @@ def create_app(config_class=None):
             status = {"label": "AMAN", "warna": "green", "deskripsi": "Sistem normal."}
         return {"status_desa": status}
 
-    # CLI command untuk inisialisasi DB
     @app.cli.command("init-db")
     def init_db_command():
         """Buat semua tabel di database."""
