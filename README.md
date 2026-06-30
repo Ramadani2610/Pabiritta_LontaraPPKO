@@ -199,15 +199,6 @@ pabiritta/
 
 ---
 
-## Roadmap
-
-- [ ] Integrasi ESP32 (EWS) — hardware sedang disiapkan
-- [ ] Notifikasi WhatsApp untuk warga saat status desa berubah
-- [ ] Export laporan ke PDF
-- [ ] Heatmap kejadian longsor per bulan
-
----
-
 ## Lisensi
 
-© 2026 PPK Ormawa SPACE — Kelompok Tangguh Bencana, Desa Lonjoboko.
+© 2026 PPK Ormawa SPACE FT-UH.
