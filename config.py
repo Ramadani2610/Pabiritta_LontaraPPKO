@@ -19,6 +19,10 @@ class Config:
         "postgresql://postgres:postgres@localhost:5432/pabiritta",
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
 
     # Upload
     UPLOAD_FOLDER = os.path.join(BASE_DIR, "app", "static", "uploads")

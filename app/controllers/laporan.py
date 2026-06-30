@@ -46,6 +46,8 @@ def buat():
             errors.append("Nama pelapor wajib diisi.")
         if not dusun:
             errors.append("Dusun wajib diisi.")
+        if not no_hp:
+            errors.append("Nomor HP wajib diisi.")
 
         # Upload foto ke Cloudinary
         foto_url = None
@@ -99,8 +101,9 @@ def daftar():
     kategori = request.args.get("kategori", "").strip()
     status = request.args.get("status", "").strip()
 
-    # Publik hanya melihat laporan yang sudah diverifikasi (bukan Menunggu)
-    query = Laporan.query.filter(Laporan.status != Laporan.STATUS_MENUNGGU)
+    query = Laporan.query.filter(
+        Laporan.status.notin_([Laporan.STATUS_MENUNGGU, Laporan.STATUS_DITOLAK])
+    )
 
     if q:
         like = f"%{q}%"
@@ -130,6 +133,5 @@ def daftar():
             Laporan.STATUS_PROSES,
             Laporan.STATUS_TINDAK_LANJUT,
             Laporan.STATUS_SELESAI,
-            Laporan.STATUS_DITOLAK,
         ],
     )

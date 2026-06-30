@@ -11,7 +11,11 @@ public_bp = Blueprint("public", __name__)
 @public_bp.route("/")
 def beranda():
     laporan_terbaru = (
-        Laporan.query.order_by(desc(Laporan.created_at)).limit(5).all()
+        Laporan.query
+        .filter(Laporan.status.notin_([Laporan.STATUS_MENUNGGU, Laporan.STATUS_DITOLAK]))
+        .order_by(desc(Laporan.created_at))
+        .limit(5)
+        .all()
     )
     sensors = Sensor.query.filter_by(is_active=True).all()
     stats = _hitung_statistik_publik()

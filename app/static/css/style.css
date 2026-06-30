@@ -34,3 +34,8 @@ body {
 .leaflet-popup-content-wrapper {
   border-radius: 8px;
 }
+/* Peta tidak menimpa navbar sticky (z-50 = 50) */
+.leaflet-pane         { z-index: 1 !important; }
+.leaflet-top,
+.leaflet-bottom       { z-index: 2 !important; }
+.leaflet-control      { z-index: 2 !important; }
