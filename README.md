@@ -28,13 +28,15 @@ memantau kondisi tanah secara real-time.
 
 ## Tech Stack
 
-| Layer        | Tools                                              |
-|--------------|----------------------------------------------------|
-| Frontend     | HTML, JavaScript vanilla, Tailwind CSS (via CDN)   |
-| Peta         | Leaflet.js + OpenStreetMap                         |
-| Backend      | Python 3.11+, Flask, Flask-Login, Flask-WTF        |
-| Database     | PostgreSQL + SQLAlchemy ORM                        |
-| Auth         | Flask-Login + bcrypt                               |
+| Layer        | Tools                                                            |
+|--------------|------------------------------------------------------------------|
+| Frontend     | HTML, JavaScript vanilla, Tailwind CSS (via CDN)                 |
+| Peta         | Leaflet.js + OpenStreetMap                                       |
+| Backend      | Python 3.11+, Flask, Flask-Login, Flask-WTF                      |
+| Database     | PostgreSQL + SQLAlchemy ORM (lokal) / **Neon** (produksi)        |
+| Gambar       | **Cloudinary** (CDN upload, menggantikan penyimpanan lokal)      |
+| Auth         | Flask-Login + bcrypt                                             |
+| Deploy       | **Vercel** (Python Serverless) + Neon + Cloudinary               |
 
 ---
 
@@ -66,7 +68,8 @@ pip install -r requirements.txt
 
 # Konfigurasi env
 cp .env.example .env
-# Edit .env — sesuaikan DATABASE_URL, SECRET_KEY, SENSOR_API_KEY
+# Edit .env — sesuaikan DATABASE_URL (Neon), SECRET_KEY,
+# CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET, dan SENSOR_API_KEY
 ```
 
 ### 4. Inisialisasi data
@@ -138,6 +141,27 @@ X-API-Key: <SENSOR_API_KEY dari .env>
 > ⚠️ **EWS belum tersedia.** Hardware ESP32 + sensor belum dipasang. Endpoint
 > ini sudah lengkap & berfungsi — tinggal arahkan ESP32 ke URL ini saat sudah
 > siap. Data dummy bisa di-seed via `seed.py`.
+
+---
+
+## Deployment (Vercel + Neon + Cloudinary)
+
+Stack produksi gratis tanpa kartu kredit:
+
+| Komponen | Layanan |
+|----------|---------|
+| App host | [Vercel](https://vercel.com) — Python Serverless via `vercel.json` |
+| Database | [Neon](https://neon.tech) — Serverless PostgreSQL |
+| Gambar   | [Cloudinary](https://cloudinary.com) — CDN upload foto laporan |
+
+### Langkah deploy
+1. Push repo ke GitHub
+2. Buat project Neon → salin `DATABASE_URL` (format `postgresql://...?sslmode=require`)
+3. Buat akun Cloudinary → salin `CLOUD_NAME`, `API_KEY`, `API_SECRET`
+4. Import repo ke Vercel → tambahkan semua env vars dari `.env.example`
+5. Vercel otomatis deploy via `vercel.json` yang sudah ada
+
+> **Catatan:** Neon bisa idle setelah tidak aktif — `pool_pre_ping=True` di `config.py` menangani reconnect otomatis.
 
 ---
 
