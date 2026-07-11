@@ -6,8 +6,14 @@
  * masih placeholder (polygon contoh) — bisa diganti GeoJSON resmi nanti.
  */
 
+const LONJOBOKO_BOUNDS = L.latLngBounds([-5.34, 119.44], [-5.21, 119.54]);
+
 function initPeta(elementId, opts = {}) {
-  const map = L.map(elementId).setView(opts.center || [-5.275, 119.488], opts.zoom || 13);
+  const map = L.map(elementId, {
+    maxBounds: LONJOBOKO_BOUNDS,
+    maxBoundsViscosity: 0.9,
+    minZoom: 12,
+  }).setView(opts.center || [-5.275, 119.488], opts.zoom || 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap',
     maxZoom: 19,
