@@ -9,13 +9,14 @@
     tailwind.config = { theme: { extend: { colors: { primary: { DEFAULT: '#DC2626', dark: '#B91C1C', light: '#FEE2E2' } } } } }
   </script>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-primary to-red-800 flex items-center justify-center px-4">
+<body class="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      style="background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 45%, #dc2626 75%, #f87171 100%);">
+  <div class="absolute top-[-80px] left-[-80px] w-72 h-72 bg-white/5 rounded-full pointer-events-none"></div>
+  <div class="absolute bottom-[-60px] right-[-60px] w-96 h-96 bg-white/5 rounded-full pointer-events-none"></div>
 
-  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative z-10">
     <div class="text-center mb-8">
-      <div class="w-16 h-16 bg-primary-light rounded-xl flex items-center justify-center mx-auto mb-4">
-        <span class="text-primary font-bold text-3xl">P</span>
-      </div>
+      <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo Pa'Biritta" class="h-16 w-auto mx-auto mb-4 object-contain">
       <h1 class="text-2xl font-bold">Pa'<span class="text-primary">Biritta</span></h1>
       <p class="text-sm text-gray-500 mt-1">Login Admin / Super Admin</p>
     </div>

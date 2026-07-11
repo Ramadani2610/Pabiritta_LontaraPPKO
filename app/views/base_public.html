@@ -29,7 +29,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <a href="{{ url_for('public.beranda') }}" class="flex items-center gap-2">
-        <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo Pa'Biritta" class="h-10 w-auto object-contain">
+        <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo Pa'Biritta" class="h-10 w-auto object-contain rounded-lg">
         <span class="font-bold text-lg">Pa'<span class="text-primary">Biritta</span></span>
       </a>
 
@@ -60,7 +60,12 @@
       <a href="{{ url_for('public.beranda') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Beranda</a>
       <a href="{{ url_for('laporan.buat') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Buat Laporan</a>
       <a href="{{ url_for('laporan.daftar') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Laporan Warga</a>
-      <a href="{{ url_for('auth.login') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Login Admin</a>
+      <div class="border-t border-gray-200 pt-2 mt-1">
+        <a href="{{ url_for('auth.login') }}" class="flex items-center gap-2 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          Login Admin
+        </a>
+      </div>
     </div>
   </div>
 </nav>
