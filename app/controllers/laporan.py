@@ -22,6 +22,7 @@ def _allowed_file(filename: str) -> bool:
 @laporan_bp.route("/buat", methods=["GET", "POST"])
 def buat():
     if request.method == "POST":
+        # Validasi field wajib
         kategori = request.form.get("kategori", "").strip()
         deskripsi = request.form.get("deskripsi", "").strip()
         lokasi_label = request.form.get("lokasi_label", "").strip() or None
@@ -29,7 +30,7 @@ def buat():
         longitude = request.form.get("longitude", "").strip()
         nama = request.form.get("nama_pelapor", "").strip()
         dusun = request.form.get("dusun", "").strip()
-        no_hp = request.form.get("no_hp", "").strip() or None
+        no_hp = request.form.get("no_hp", "").strip()
 
         errors = []
         if kategori not in Laporan.KATEGORI_CHOICES:
@@ -101,6 +102,7 @@ def daftar():
     kategori = request.args.get("kategori", "").strip()
     status = request.args.get("status", "").strip()
 
+    # Publik hanya melihat laporan yang sudah diverifikasi (bukan Menunggu/Ditolak)
     query = Laporan.query.filter(
         Laporan.status.notin_([Laporan.STATUS_MENUNGGU, Laporan.STATUS_DITOLAK])
     )
@@ -135,3 +137,12 @@ def daftar():
             Laporan.STATUS_SELESAI,
         ],
     )
+
+
+@laporan_bp.route("/<int:laporan_id>")
+def detail(laporan_id):
+    laporan = Laporan.query.get_or_404(laporan_id)
+    if laporan.status in (Laporan.STATUS_MENUNGGU, Laporan.STATUS_DITOLAK):
+        from flask import abort
+        abort(404)
+    return render_template("public/detail_laporan.html", laporan=laporan)
