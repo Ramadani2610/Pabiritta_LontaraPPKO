@@ -3,14 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
   <title>Login Admin | Pa'Biritta</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = { theme: { extend: { colors: { primary: { DEFAULT: '#DC2626', dark: '#B91C1C', light: '#FEE2E2' } } } } }
   </script>
+  <style>
+    html, body { min-height: 100%; }
+    html {
+      background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 45%, #dc2626 75%, #f87171 100%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+    body { background: transparent; overflow-x: hidden; }
+  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
-      style="background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 45%, #dc2626 75%, #f87171 100%);">
+<body class="min-h-screen flex items-center justify-center px-4 py-8 relative">
   <div class="absolute top-[-80px] left-[-80px] w-72 h-72 bg-white/5 rounded-full pointer-events-none"></div>
   <div class="absolute bottom-[-60px] right-[-60px] w-96 h-96 bg-white/5 rounded-full pointer-events-none"></div>
 
