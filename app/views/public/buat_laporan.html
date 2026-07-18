@@ -80,13 +80,13 @@
         Gunakan Lokasi Saya
       </button>
 
-      <div id="lokasi-accuracy-info" class="hidden mt-2 text-xs px-3 py-2 rounded-lg"></div>
-
       <label class="block text-sm font-medium mb-2">Label Lokasi <span class="text-red-500">*</span></label>
       <input type="text" name="lokasi_label" id="lokasi-label-input" required
              placeholder="Contoh: Jl. Poros Desa, Dekat Jembatan"
              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary mb-4"
              value="{{ form.lokasi_label or '' }}">
+
+      <div id="lokasi-accuracy-info" class="hidden mt-2 text-xs px-3 py-2 rounded-lg"></div>
 
       <label class="block text-sm font-medium mb-2">Klik peta untuk tandai lokasi <span class="text-red-500">*</span></label>
       <div id="map-pilih" class="h-80 rounded-lg border border-gray-200 mb-3"></div>
@@ -133,7 +133,13 @@
         </div>
         <div>
           <label class="block text-sm font-medium mb-2">No. HP <span class="text-red-500">*</span></label>
-          <input type="tel" name="no_hp" required placeholder="08xx-xxxx-xxxx" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg" value="{{ form.no_hp or '' }}">
+          <input type="tel" name="no_hp" id="input-hp" required
+                 inputmode="numeric" maxlength="13" pattern="08[0-9]{8,11}"
+                 placeholder="08xxxxxxxxxx"
+                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                 value="{{ form.no_hp or '' }}">
+          <p id="hp-error" class="hidden mt-1.5 text-xs text-red-600"></p>
+          <p id="hp-hint" class="mt-1.5 text-xs text-gray-500">Hanya angka. Diawali 08, total 10–13 digit. Contoh: 081234567890</p>
         </div>
       </div>
     </section>
@@ -312,13 +318,9 @@
         showStepError('Pilih dusun terlebih dahulu.');
         return false;
       }
-      const hp = f.no_hp.value.trim().replace(/[\s\-]/g, '');
-      if (!hp) {
-        showStepError('Nomor HP wajib diisi.');
-        return false;
-      }
-      if (!/^08\d{8,11}$/.test(hp)) {
-        showStepError('Format nomor HP tidak valid. Contoh: 0812-3456-7890 (diawali 08, 10–13 digit).');
+      if (!validateHp(true)) {
+        showStepError('Perbaiki nomor HP terlebih dahulu.');
+        hpInput.focus();
         return false;
       }
       return true;
@@ -378,6 +380,51 @@
   });
   document.getElementById('btn-prev').addEventListener('click', () => {
     if (currentStep > 1) { currentStep--; updateStepper(); }
+  });
+
+  // --- HP: hanya angka + validasi real-time ---
+  const hpInput = document.getElementById('input-hp');
+  const hpError = document.getElementById('hp-error');
+  const hpHint  = document.getElementById('hp-hint');
+
+  function validateHp(showEmpty) {
+    const v = hpInput.value;
+    let msg = '';
+    if (!v) {
+      if (showEmpty) msg = 'Nomor HP wajib diisi.';
+    } else if (!v.startsWith('08')) {
+      msg = 'Nomor HP harus diawali dengan 08.';
+    } else if (v.length < 10) {
+      msg = `Terlalu pendek (${v.length} digit). Minimal 10 digit.`;
+    } else if (v.length > 13) {
+      msg = `Terlalu panjang (${v.length} digit). Maksimal 13 digit.`;
+    }
+    if (msg) {
+      hpError.textContent = msg;
+      hpError.classList.remove('hidden');
+      hpHint.classList.add('hidden');
+      hpInput.classList.add('border-red-500');
+      hpInput.classList.remove('border-gray-300');
+      return false;
+    }
+    hpError.classList.add('hidden');
+    hpHint.classList.remove('hidden');
+    hpInput.classList.remove('border-red-500');
+    hpInput.classList.add('border-gray-300');
+    return true;
+  }
+
+  hpInput.addEventListener('input', () => {
+    const cleaned = hpInput.value.replace(/\D/g, '');
+    if (cleaned !== hpInput.value) hpInput.value = cleaned;
+    validateHp(false);
+  });
+  hpInput.addEventListener('blur', () => validateHp(true));
+  hpInput.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    hpInput.value = text.replace(/\D/g, '').slice(0, 13);
+    validateHp(false);
   });
 
   document.getElementById('input-foto').addEventListener('change', (e) => {
