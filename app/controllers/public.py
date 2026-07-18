@@ -12,7 +12,7 @@ public_bp = Blueprint("public", __name__)
 def beranda():
     laporan_terbaru = (
         Laporan.query
-        .filter(Laporan.status.notin_([Laporan.STATUS_MENUNGGU, Laporan.STATUS_DITOLAK]))
+        .filter(Laporan.status != Laporan.STATUS_MENUNGGU)
         .order_by(desc(Laporan.created_at))
         .limit(5)
         .all()

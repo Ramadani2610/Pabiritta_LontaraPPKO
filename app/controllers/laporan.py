@@ -111,10 +111,9 @@ def daftar():
     kategori = request.args.get("kategori", "").strip()
     status = request.args.get("status", "").strip()
 
-    # Publik hanya melihat laporan yang sudah diverifikasi (bukan Menunggu/Ditolak)
-    query = Laporan.query.filter(
-        Laporan.status.notin_([Laporan.STATUS_MENUNGGU, Laporan.STATUS_DITOLAK])
-    )
+    # Publik melihat semua laporan yang sudah diproses admin (bukan Menunggu),
+    # termasuk yang Ditolak agar transparan.
+    query = Laporan.query.filter(Laporan.status != Laporan.STATUS_MENUNGGU)
 
     if q:
         like = f"%{q}%"
@@ -144,6 +143,7 @@ def daftar():
             Laporan.STATUS_PROSES,
             Laporan.STATUS_TINDAK_LANJUT,
             Laporan.STATUS_SELESAI,
+            Laporan.STATUS_DITOLAK,
         ],
     )
 
@@ -151,7 +151,7 @@ def daftar():
 @laporan_bp.route("/<int:laporan_id>")
 def detail(laporan_id):
     laporan = Laporan.query.get_or_404(laporan_id)
-    if laporan.status in (Laporan.STATUS_MENUNGGU, Laporan.STATUS_DITOLAK):
+    if laporan.status == Laporan.STATUS_MENUNGGU:
         from flask import abort
         abort(404)
     return render_template("public/detail_laporan.html", laporan=laporan)
