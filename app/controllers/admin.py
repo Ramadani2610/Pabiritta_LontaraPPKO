@@ -145,6 +145,26 @@ def ubah_status(laporan_id):
 
 
 # -------------------- MANAJEMEN PENGGUNA (SUPERADMIN) --------------------
+@admin_bp.route("/laporan/<int:laporan_id>/hapus", methods=["POST"])
+@superadmin_required
+def hapus_laporan(laporan_id):
+    laporan = Laporan.query.get_or_404(laporan_id)
+    Aktivitas.log(
+        current_user.nama,
+        "Menghapus Laporan",
+        f"Laporan #{laporan.id} ({laporan.kategori}) dari {laporan.nama_pelapor}",
+    )
+    try:
+        db.session.delete(laporan)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Gagal menghapus laporan: {e}", "error")
+        return redirect(url_for("admin.detail_laporan", laporan_id=laporan_id))
+
+    flash(f"Laporan #{laporan_id} berhasil dihapus.", "success")
+    return redirect(url_for("admin.manajemen_laporan"))
+
 @admin_bp.route("/pengguna")
 @superadmin_required
 def manajemen_pengguna():
