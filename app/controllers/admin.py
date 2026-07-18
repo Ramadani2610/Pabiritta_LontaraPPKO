@@ -154,7 +154,7 @@ def riwayat_aktivitas():
     tanggal_dari = request.args.get("dari", "").strip()
     tanggal_sampai = request.args.get("sampai", "").strip()
     page = max(1, request.args.get("page", 1, type=int))
-    per_page = 25
+    per_page = 15
 
     query = Aktivitas.query
     if q:
