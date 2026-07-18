@@ -63,8 +63,8 @@
           <div class="w-14 h-14 mx-auto mb-3 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-400">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
           </div>
-          <p class="font-medium text-gray-700">Klik untuk unggah atau ambil foto</p>
-          <p class="text-xs text-gray-400 mt-1">Opsional. Maksimal 5MB (JPG, PNG)</p>
+          <p class="font-medium text-gray-700">Klik untuk unggah atau ambil foto <span class="text-red-500">*</span></p>
+          <p class="text-xs text-gray-400 mt-1">Wajib. Maksimal 5MB (JPG, PNG)</p>
         </div>
         <input type="file" name="foto" id="input-foto" accept="image/jpeg,image/png" class="hidden">
       </label>
@@ -75,21 +75,20 @@
       <h2 class="text-lg font-bold mb-4">Lokasi Kejadian</h2>
 
       <button type="button" id="btn-lokasi-otomatis"
-              class="mb-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition font-medium">
+              class="mb-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition font-medium">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Gunakan Lokasi Saya
       </button>
 
-      <!-- Accuracy feedback — ditampilkan setelah geolokasi -->
-      <div id="lokasi-accuracy-info" class="hidden mb-4 text-sm rounded-lg px-4 py-3 flex items-start gap-2"></div>
+      <div id="lokasi-accuracy-info" class="hidden mt-2 text-xs px-3 py-2 rounded-lg"></div>
 
       <label class="block text-sm font-medium mb-2">Label Lokasi <span class="text-red-500">*</span></label>
       <input type="text" name="lokasi_label" id="lokasi-label-input" required
-             placeholder="Contoh: Dekat Jembatan Dusun Tombongi, Desa Lonjoboko"
+             placeholder="Contoh: Jl. Poros Desa, Dekat Jembatan"
              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary mb-4"
              value="{{ form.lokasi_label or '' }}">
 
-      <label class="block text-sm font-medium mb-2">Klik peta untuk tandai lokasi yang tepat <span class="text-red-500">*</span></label>
+      <label class="block text-sm font-medium mb-2">Klik peta untuk tandai lokasi <span class="text-red-500">*</span></label>
       <div id="map-pilih" class="h-80 rounded-lg border border-gray-200 mb-3"></div>
       <div class="grid grid-cols-2 gap-3">
         <input type="text" name="latitude" id="lat-field" placeholder="Latitude" readonly
@@ -181,7 +180,6 @@
   }).addTo(mapPilih);
 
   let marker = null;
-  let accuracyCircle = null;
 
   function setMarker(lat, lng) {
     const latlng = L.latLng(lat, lng);
@@ -191,12 +189,7 @@
     document.getElementById('lng-field').value = lng.toFixed(6);
   }
 
-  mapPilih.on('click', (e) => {
-    setMarker(e.latlng.lat, e.latlng.lng);
-    // Hapus lingkaran akurasi jika user memilih manual
-    if (accuracyCircle) { mapPilih.removeLayer(accuracyCircle); accuracyCircle = null; }
-    hideAccuracyInfo();
-  });
+  mapPilih.on('click', (e) => setMarker(e.latlng.lat, e.latlng.lng));
 
   const _lat0 = document.getElementById('lat-field').value;
   const _lng0 = document.getElementById('lng-field').value;
@@ -205,104 +198,65 @@
     mapPilih.setView([_lat0, _lng0], 15);
   }
 
-  // --- ACCURACY DISPLAY ---
-  function showAccuracyInfo(accuracy) {
-    const el = document.getElementById('lokasi-accuracy-info');
-    const acc = Math.round(accuracy);
-
-    if (accuracy <= 100) {
-      // Akurasi sangat baik
-      el.className = 'mb-4 text-sm rounded-lg px-4 py-3 flex items-start gap-2 bg-green-50 border border-green-200 text-green-800';
-      el.innerHTML = `
-        <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span><strong>Akurasi sangat baik (±${acc}m).</strong> Lokasi GPS berhasil diambil.</span>`;
-    } else if (accuracy <= 500) {
-      // Akurasi cukup baik
-      el.className = 'mb-4 text-sm rounded-lg px-4 py-3 flex items-start gap-2 bg-blue-50 border border-blue-200 text-blue-800';
-      el.innerHTML = `
-        <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span><strong>Akurasi cukup (±${acc}m).</strong> Periksa posisi pin di peta, geser jika perlu.</span>`;
-    } else {
-      // Akurasi buruk — lokasi dari jaringan, bukan GPS
-      el.className = 'mb-4 text-sm rounded-lg px-4 py-3 flex items-start gap-2 bg-yellow-50 border border-yellow-300 text-yellow-800';
-      el.innerHTML = `
-        <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        <div>
-          <strong>Akurasi rendah (±${acc}m) lokasi mungkin tidak tepat.</strong><br>
-          <span class="text-xs mt-1 block">Perangkat menggunakan lokasi jaringan, bukan GPS. Harap <strong>geser pin</strong> ke lokasi kejadian yang benar di peta, dan isi label lokasi secara manual.</span>
-        </div>`;
-    }
-    el.classList.remove('hidden');
-  }
-
-  function hideAccuracyInfo() {
-    document.getElementById('lokasi-accuracy-info').classList.add('hidden');
-  }
-
   // --- AUTO LOCATION ---
+  let accuracyCircle = null;
   document.getElementById('btn-lokasi-otomatis').addEventListener('click', function () {
     if (!navigator.geolocation) {
       showStepError('Browser Anda tidak mendukung geolokasi.');
       return;
     }
     this.disabled = true;
-    this.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Mengambil lokasi GPS...';
+    this.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Mengambil lokasi...';
     const btn = this;
-
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         const accuracy = pos.coords.accuracy;
-
         setMarker(lat, lng);
-        // Zoom level menyesuaikan akurasi
-        const zoom = accuracy < 100 ? 17 : accuracy < 500 ? 15 : 13;
-        mapPilih.setView([lat, lng], zoom);
+        mapPilih.setView([lat, lng], 16);
 
-        // Tampilkan lingkaran radius akurasi di peta
-        if (accuracyCircle) mapPilih.removeLayer(accuracyCircle);
+        if (accuracyCircle) accuracyCircle.remove();
+        const circleColor = accuracy <= 100 ? '#16A34A' : accuracy <= 500 ? '#2563EB' : '#D97706';
         accuracyCircle = L.circle([lat, lng], {
-          radius: accuracy,
-          color: accuracy <= 500 ? '#3B82F6' : '#F59E0B',
-          fillColor: accuracy <= 500 ? '#93C5FD' : '#FDE68A',
-          fillOpacity: 0.2,
-          weight: 1,
+          radius: accuracy, color: circleColor, fillColor: circleColor, fillOpacity: 0.15, weight: 1.5,
         }).addTo(mapPilih);
 
-        showAccuracyInfo(accuracy);
-
-        if (accuracy <= 500) {
-          // Akurasi cukup baik → auto-isi label dari Nominatim
-          fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=id`)
-            .then(r => r.json())
-            .then(data => {
-              if (data.display_name) {
-                document.getElementById('lokasi-label-input').value = data.display_name.substring(0, 200);
-              }
-            })
-            .catch(() => {})
-            .finally(() => {
-              btn.disabled = false;
-              btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Lokasi berhasil diambil';
-            });
+        const infoEl = document.getElementById('lokasi-accuracy-info');
+        infoEl.classList.remove('hidden');
+        if (accuracy <= 100) {
+          infoEl.className = 'mt-2 text-xs px-3 py-2 rounded-lg bg-green-50 text-green-700 border border-green-200';
+          infoEl.textContent = `Akurasi GPS: ±${Math.round(accuracy)}m (sangat baik)`;
+        } else if (accuracy <= 500) {
+          infoEl.className = 'mt-2 text-xs px-3 py-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200';
+          infoEl.textContent = `Akurasi GPS: ±${Math.round(accuracy)}m (cukup baik)`;
         } else {
-          // Akurasi buruk → JANGAN auto-isi label (hasilnya salah)
-          // Kosongkan label agar user mengisi manual
-          document.getElementById('lokasi-label-input').value = '';
-          document.getElementById('lokasi-label-input').focus();
-          btn.disabled = false;
-          btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> Coba Lagi';
+          infoEl.className = 'mt-2 text-xs px-3 py-2 rounded-lg bg-yellow-50 text-yellow-700 border border-yellow-200';
+          infoEl.textContent = `Akurasi GPS: ±${Math.round(accuracy)}m — sinyal lemah. Geser pin ke lokasi tepat dan ketik label lokasi manual.`;
         }
+
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Lokasi berhasil diambil';
+
+        if (accuracy > 500) {
+          const labelInput = document.getElementById('lokasi-label-input');
+          labelInput.value = '';
+          labelInput.placeholder = 'Akurasi lemah — ketik nama lokasi manual';
+          labelInput.focus();
+          return;
+        }
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=id`)
+          .then(r => r.json())
+          .then(data => {
+            document.getElementById('lokasi-label-input').value = (data.display_name || '').substring(0, 200);
+          })
+          .catch(() => {});
       },
       (err) => {
         btn.disabled = false;
         btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> Gunakan Lokasi Saya';
-        const msgs = {
-          1: 'Akses lokasi ditolak. Izinkan akses lokasi di pengaturan browser.',
-          2: 'Lokasi tidak tersedia saat ini.',
-          3: 'Waktu habis. Pastikan GPS aktif lalu coba lagi.',
-        };
+        const msgs = { 1: 'Akses lokasi ditolak. Izinkan akses lokasi di pengaturan browser.', 2: 'Lokasi tidak tersedia saat ini.', 3: 'Waktu habis. Coba lagi.' };
         showStepError(msgs[err.code] || 'Gagal mendapatkan lokasi.');
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
@@ -320,14 +274,20 @@
   // --- VALIDATION ---
   function validateStep() {
     const f = document.forms['form-laporan'];
-    if (currentStep === 1) return true;
+    if (currentStep === 1) {
+      if (!document.getElementById('input-foto').files.length) {
+        showStepError('Foto bukti kejadian wajib diunggah sebelum melanjutkan.');
+        return false;
+      }
+      return true;
+    }
     if (currentStep === 2) {
       if (!f.latitude.value || !f.longitude.value) {
         showStepError('Pilih titik lokasi di peta terlebih dahulu.');
         return false;
       }
       if (!f.lokasi_label.value.trim()) {
-        showStepError('Label lokasi wajib diisi. Klik "Gunakan Lokasi Saya" atau ketik nama lokasi secara manual.');
+        showStepError('Label lokasi wajib diisi. Klik "Gunakan Lokasi Saya" atau ketik manual.');
         return false;
       }
       return true;
@@ -352,8 +312,13 @@
         showStepError('Pilih dusun terlebih dahulu.');
         return false;
       }
-      if (!f.no_hp.value.trim()) {
+      const hp = f.no_hp.value.trim().replace(/[\s\-]/g, '');
+      if (!hp) {
         showStepError('Nomor HP wajib diisi.');
+        return false;
+      }
+      if (!/^08\d{8,11}$/.test(hp)) {
+        showStepError('Format nomor HP tidak valid. Contoh: 0812-3456-7890 (diawali 08, 10–13 digit).');
         return false;
       }
       return true;

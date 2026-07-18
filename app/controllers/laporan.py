@@ -30,7 +30,9 @@ def buat():
         longitude = request.form.get("longitude", "").strip()
         nama = request.form.get("nama_pelapor", "").strip()
         dusun = request.form.get("dusun", "").strip()
-        no_hp = request.form.get("no_hp", "").strip()
+        no_hp = request.form.get("no_hp", "").strip() or None
+
+        import re
 
         errors = []
         if kategori not in Laporan.KATEGORI_CHOICES:
@@ -47,13 +49,19 @@ def buat():
             errors.append("Nama pelapor wajib diisi.")
         if not dusun:
             errors.append("Dusun wajib diisi.")
-        if not no_hp:
+        if no_hp:
+            hp_clean = re.sub(r'[\s\-]', '', no_hp)
+            if not re.match(r'^08\d{8,11}$', hp_clean):
+                errors.append("Format nomor HP tidak valid. Contoh: 0812-3456-7890.")
+        else:
             errors.append("Nomor HP wajib diisi.")
 
-        # Upload foto ke Cloudinary
+        # Upload foto ke Cloudinary (wajib)
         foto_url = None
         file = request.files.get("foto")
-        if file and file.filename:
+        if not file or not file.filename:
+            errors.append("Foto bukti kejadian wajib diunggah.")
+        else:
             if not _allowed_file(file.filename):
                 errors.append("Format foto harus JPG atau PNG.")
             else:
@@ -87,6 +95,7 @@ def buat():
             status=Laporan.STATUS_MENUNGGU,
         )
         db.session.add(laporan)
+        db.session.flush()  # assign laporan.id before logging
         Aktivitas.log("Sistem", "Menerima Laporan Baru", f"Laporan #{laporan.id} dari {nama}")
         db.session.commit()
 

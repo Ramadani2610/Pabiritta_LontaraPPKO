@@ -48,7 +48,11 @@ async function fetchAndRenderLayers(map) {
 
   LAYERS.posko = L.layerGroup([
     L.circleMarker([-5.278, 119.495], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
-      .bindPopup('<strong>Posko Siaga</strong><br>Balai Desa'),
+      .bindPopup('<strong>Posko Siaga Desa</strong><br>Balai Desa Lonjoboko<br><a href="tel:08112233445" style="color:#DC2626;font-weight:600;">0811-2233-4455</a>'),
+    L.circleMarker([-5.271, 119.490], { color: '#2563EB', fillColor: '#2563EB', fillOpacity: 0.9, radius: 8 })
+      .bindPopup('<strong>Puskesmas Parangloe</strong><br><a href="tel:08223344556" style="color:#DC2626;font-weight:600;">0822-3344-5566</a>'),
+    L.circleMarker([-5.265, 119.500], { color: '#7C3AED', fillColor: '#7C3AED', fillOpacity: 0.9, radius: 8 })
+      .bindPopup('<strong>BPBD Kab. Gowa</strong><br>Hotline: <a href="tel:112" style="color:#DC2626;font-weight:600;">112</a>'),
   ]);
 
   LAYERS.evakuasi = L.layerGroup([
@@ -92,7 +96,7 @@ async function fetchAndRenderLayers(map) {
     LAYERS.laporan = L.layerGroup(
       data.map(l => L.circleMarker([l.latitude, l.longitude], {
         radius: 7, color: '#2563EB', fillColor: '#2563EB', fillOpacity: 0.8, weight: 2,
-      }).bindPopup(`<strong>${l.lokasi_label}</strong><br>${l.kategori}<br>Status: ${l.status}`))
+      }).bindPopup(`<strong>${l.lokasi_label}</strong><br>${l.kategori}<br>Status: <b>${l.status}</b><br><a href="/laporan/${l.id}" style="color:#DC2626;font-weight:600;">Lihat Detail →</a>`))
     );
   } catch (e) {
     LAYERS.laporan = L.layerGroup();

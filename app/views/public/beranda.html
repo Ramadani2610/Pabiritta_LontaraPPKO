@@ -89,7 +89,7 @@
             <label class="flex items-center gap-2"><input type="checkbox" data-layer="zona" class="rounded text-primary"> Zona Rawan Longsor</label>
             <label class="flex items-center gap-2"><input type="checkbox" data-layer="sensor" class="rounded text-primary" checked> Sensor IoT</label>
             <label class="flex items-center gap-2"><input type="checkbox" data-layer="posko" class="rounded text-primary"> Posko Siaga Bencana</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-layer="laporan" class="rounded text-primary"> Persebaran titik longsor</label>
+            <label class="flex items-center gap-2"><input type="checkbox" data-layer="laporan" class="rounded text-primary" checked> Persebaran titik longsor</label>
             <label class="flex items-center gap-2"><input type="checkbox" data-layer="kemiringan" class="rounded text-primary"> Zona kemiringan lereng</label>
             <label class="flex items-center gap-2"><input type="checkbox" data-layer="evakuasi" class="rounded text-primary"> Jalur evakuasi</label>
             <label class="flex items-center gap-2"><input type="checkbox" data-layer="kumpul" class="rounded text-primary"> Titik Kumpul</label>
@@ -159,9 +159,18 @@
           <h2 class="font-bold">Kontak Darurat</h2>
         </div>
         <ul class="space-y-3 text-sm">
-          <li class="flex justify-between"><span class="text-gray-300">Posko Siaga Desa</span> <span class="text-primary font-semibold">0811-2233-4455</span></li>
-          <li class="flex justify-between"><span class="text-gray-300">BPBD Kabupaten</span> <span class="text-primary font-semibold">112</span></li>
-          <li class="flex justify-between"><span class="text-gray-300">Puskesmas</span> <span class="text-primary font-semibold">0822-3344-5566</span></li>
+          <li class="flex justify-between items-center">
+            <span class="text-gray-300">Posko Siaga Desa</span>
+            <a href="tel:08112233445" class="text-primary font-semibold hover:underline">0811-2233-4455</a>
+          </li>
+          <li class="flex justify-between items-center">
+            <span class="text-gray-300">BPBD Kabupaten</span>
+            <a href="tel:112" class="text-primary font-semibold hover:underline">112</a>
+          </li>
+          <li class="flex justify-between items-center">
+            <span class="text-gray-300">Puskesmas</span>
+            <a href="tel:08223344556" class="text-primary font-semibold hover:underline">0822-3344-5566</a>
+          </li>
         </ul>
       </div>
     </div>
