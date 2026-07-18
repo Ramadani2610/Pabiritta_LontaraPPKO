@@ -6,13 +6,9 @@
  * masih placeholder (polygon contoh) — bisa diganti GeoJSON resmi nanti.
  */
 
-const LONJOBOKO_BOUNDS = L.latLngBounds([-5.34, 119.44], [-5.21, 119.54]);
-
 function initPeta(elementId, opts = {}) {
   const map = L.map(elementId, {
-    maxBounds: LONJOBOKO_BOUNDS,
-    maxBoundsViscosity: 0.9,
-    minZoom: 12,
+    minZoom: 10,
   }).setView(opts.center || [-5.275, 119.488], opts.zoom || 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap',
@@ -93,11 +89,11 @@ async function fetchAndRenderLayers(map) {
   try {
     const res = await fetch('/api/sensor/laporan-titik');
     const data = await res.json();
-    LAYERS.laporan = L.layerGroup(
-      data.map(l => L.circleMarker([l.latitude, l.longitude], {
-        radius: 7, color: '#2563EB', fillColor: '#2563EB', fillOpacity: 0.8, weight: 2,
-      }).bindPopup(`<strong>${l.lokasi_label}</strong><br>${l.kategori}<br>Status: <b>${l.status}</b><br><a href="/laporan/${l.id}" style="color:#DC2626;font-weight:600;">Lihat Detail →</a>`))
-    );
+    const valid = data.filter(l => l.latitude != null && l.longitude != null);
+    const markers = valid.map(l => L.circleMarker([l.latitude, l.longitude], {
+      radius: 7, color: '#2563EB', fillColor: '#2563EB', fillOpacity: 0.8, weight: 2,
+    }).bindPopup(`<strong>${l.lokasi_label}</strong><br>${l.kategori}<br>Status: <b>${l.status}</b><br><a href="/laporan/${l.id}" style="color:#DC2626;font-weight:600;">Lihat Detail →</a>`));
+    LAYERS.laporan = L.layerGroup(markers);
   } catch (e) {
     LAYERS.laporan = L.layerGroup();
   }

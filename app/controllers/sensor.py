@@ -77,12 +77,11 @@ def list_sensors():
 
 @sensor_bp.route("/laporan-titik", methods=["GET"])
 def titik_laporan():
-    """Untuk peta — titik laporan yang sudah diverifikasi."""
+    """Untuk peta — titik laporan yang sudah tidak menunggu (termasuk Ditolak)."""
     from app.models.laporan import Laporan
     items = []
     laporans = Laporan.query.filter(
         Laporan.status != Laporan.STATUS_MENUNGGU,
-        Laporan.status != Laporan.STATUS_DITOLAK,
     ).all()
     for l in laporans:
         items.append({
