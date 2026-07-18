@@ -121,21 +121,26 @@ def ubah_status(laporan_id):
     catatan = request.form.get("catatan_admin", "").strip()
 
     if new_status not in Laporan.STATUS_CHOICES:
-        flash("Status tidak valid.", "error")
+        flash(f"Status '{new_status}' tidak valid. Pilihan: {', '.join(Laporan.STATUS_CHOICES)}", "error")
         return redirect(url_for("admin.detail_laporan", laporan_id=laporan_id))
 
     old_status = laporan.status
     laporan.status = new_status
-    if catatan:
-        laporan.catatan_admin = catatan
+    laporan.catatan_admin = catatan or None
 
     Aktivitas.log(
         current_user.nama,
         f"Mengubah Status Laporan ({new_status})",
         f"Laporan #{laporan.id}: {old_status} → {new_status}",
     )
-    db.session.commit()
-    flash(f"Status laporan berhasil diubah menjadi {new_status}.", "success")
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Gagal menyimpan perubahan: {e}", "error")
+        return redirect(url_for("admin.detail_laporan", laporan_id=laporan_id))
+
+    flash(f"Status laporan #{laporan.id} berhasil diubah dari '{old_status}' menjadi '{new_status}'.", "success")
     return redirect(url_for("admin.detail_laporan", laporan_id=laporan_id))
 
 

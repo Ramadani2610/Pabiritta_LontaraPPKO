@@ -34,6 +34,15 @@ def create_app(config_class=None):
     # Init extensions
     db.init_app(app)
     csrf.init_app(app)
+    # CSRF error handler — jangan silent-fail, tampilkan pesan yang jelas
+    from flask_wtf.csrf import CSRFError
+
+    @app.errorhandler(CSRFError)
+    def _csrf_err(e):
+        from flask import flash, redirect, request
+        flash(f"Sesi login kadaluarsa atau token CSRF tidak valid ({e.description}). Silakan refresh halaman dan coba lagi.", "error")
+        return redirect(request.referrer or "/"), 400
+
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
     login_manager.login_message = "Silakan login terlebih dahulu."
