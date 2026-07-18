@@ -143,6 +143,76 @@ def ubah_status(laporan_id):
     flash(f"Status laporan #{laporan.id} berhasil diubah dari '{old_status}' menjadi '{new_status}'.", "success")
     return redirect(url_for("admin.detail_laporan", laporan_id=laporan_id))
 
+# -------------------- RIWAYAT AKTIVITAS SISTEM --------------------
+@admin_bp.route("/aktivitas")
+@login_required
+def riwayat_aktivitas():
+    from datetime import datetime, timedelta
+
+    q = request.args.get("q", "").strip()
+    aktor = request.args.get("aktor", "").strip()
+    tanggal_dari = request.args.get("dari", "").strip()
+    tanggal_sampai = request.args.get("sampai", "").strip()
+    page = max(1, request.args.get("page", 1, type=int))
+    per_page = 25
+
+    query = Aktivitas.query
+    if q:
+        like = f"%{q}%"
+        query = query.filter(
+            or_(
+                Aktivitas.aksi.ilike(like),
+                Aktivitas.keterangan.ilike(like),
+                Aktivitas.aktor.ilike(like),
+            )
+        )
+    if aktor:
+        query = query.filter_by(aktor=aktor)
+    if tanggal_dari:
+        try:
+            d = datetime.strptime(tanggal_dari, "%Y-%m-%d")
+            query = query.filter(Aktivitas.created_at >= d)
+        except ValueError:
+            pass
+    if tanggal_sampai:
+        try:
+            d = datetime.strptime(tanggal_sampai, "%Y-%m-%d") + timedelta(days=1)
+            query = query.filter(Aktivitas.created_at < d)
+        except ValueError:
+            pass
+
+    total = query.count()
+    total_pages = max(1, (total + per_page - 1) // per_page)
+    page = min(page, total_pages)
+
+    aktivitas = (
+        query.order_by(desc(Aktivitas.created_at))
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+        .all()
+    )
+
+    aktor_list = [
+        row[0]
+        for row in db.session.query(Aktivitas.aktor)
+        .distinct()
+        .order_by(Aktivitas.aktor)
+        .all()
+    ]
+
+    return render_template(
+        "admin/riwayat_aktivitas.html",
+        aktivitas=aktivitas,
+        aktor_list=aktor_list,
+        q=q,
+        aktor=aktor,
+        tanggal_dari=tanggal_dari,
+        tanggal_sampai=tanggal_sampai,
+        page=page,
+        total_pages=total_pages,
+        total=total,
+        per_page=per_page,
+    )
 
 # -------------------- MANAJEMEN PENGGUNA (SUPERADMIN) --------------------
 @admin_bp.route("/laporan/<int:laporan_id>/hapus", methods=["POST"])
