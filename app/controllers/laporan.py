@@ -110,6 +110,8 @@ def daftar():
     q = request.args.get("q", "").strip()
     kategori = request.args.get("kategori", "").strip()
     status = request.args.get("status", "").strip()
+    page = max(1, request.args.get("page", 1, type=int))
+    per_page = 10
 
     # Publik melihat semua laporan yang sudah diproses admin (bukan Menunggu),
     # termasuk yang Ditolak agar transparan.
@@ -130,7 +132,16 @@ def daftar():
     if status and status in Laporan.STATUS_CHOICES:
         query = query.filter_by(status=status)
 
-    laporans = query.order_by(desc(Laporan.created_at)).all()
+    total = query.count()
+    total_pages = max(1, (total + per_page - 1) // per_page)
+    page = min(page, total_pages)
+
+    laporans = (
+        query.order_by(desc(Laporan.created_at))
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+        .all()
+    )
 
     return render_template(
         "public/laporan_warga.html",
@@ -145,6 +156,10 @@ def daftar():
             Laporan.STATUS_SELESAI,
             Laporan.STATUS_DITOLAK,
         ],
+        page=page,
+        total_pages=total_pages,
+        total=total,
+        per_page=per_page,
     )
 
 

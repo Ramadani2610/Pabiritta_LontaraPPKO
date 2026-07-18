@@ -35,10 +35,27 @@
       {% endfor %}
     </select>
     <button type="submit" class="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">Terapkan</button>
+    {% if q or kategori or status %}
+      <a href="{{ url_for('laporan.daftar') }}"
+         class="px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 text-center">
+        Reset
+      </a>
+    {% endif %}
   </form>
 
+  <!-- Info jumlah -->
+  <div class="flex items-center justify-between text-sm text-gray-500">
+    <span>
+      Menampilkan <strong class="text-gray-700">{{ laporans|length }}</strong> dari
+      <strong class="text-gray-700">{{ total }}</strong> laporan
+    </span>
+    {% if total_pages > 1 %}
+      <span>Halaman <strong class="text-gray-700">{{ page }}</strong> / {{ total_pages }}</span>
+    {% endif %}
+  </div>
+
   <!-- Daftar laporan -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {% for l in laporans %}
     <a href="{{ url_for('laporan.detail', laporan_id=l.id) }}" class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition block">
       <div class="relative h-48 bg-gray-100">
@@ -76,9 +93,67 @@
     </a>
     {% else %}
       <div class="md:col-span-2 text-center py-16 text-gray-400">
-        <p class="text-lg">Belum ada laporan yang cocok dengan filter Anda.</p>
+        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        <p class="font-medium">Belum ada laporan yang cocok.</p>
+        <p class="text-sm mt-1">Coba ubah atau reset filter pencarian.</p>
       </div>
     {% endfor %}
   </div>
+
+  <!-- Pagination -->
+  {% if total_pages > 1 %}
+  {% set base_args = {'q': q, 'kategori': kategori, 'status': status} %}
+  <div class="flex items-center justify-between text-sm border-t border-gray-100 pt-6">
+    <div class="text-gray-500">
+      Halaman <strong>{{ page }}</strong> dari {{ total_pages }}
+    </div>
+    <div class="flex items-center gap-2">
+      {% if page > 1 %}
+        <a href="{{ url_for('laporan.daftar', page=page-1, **base_args) }}"
+           class="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 font-medium">
+          ← Sebelumnya
+        </a>
+      {% else %}
+        <span class="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-100 rounded-lg text-gray-300 font-medium cursor-not-allowed">
+          ← Sebelumnya
+        </span>
+      {% endif %}
+
+      {# Nomor halaman (maks 5 tombol) #}
+      {% set start = [1, page - 2]|max %}
+      {% set end   = [total_pages, page + 2]|min %}
+      {% if start > 1 %}
+        <a href="{{ url_for('laporan.daftar', page=1, **base_args) }}"
+           class="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50">1</a>
+        {% if start > 2 %}<span class="px-1 text-gray-400">…</span>{% endif %}
+      {% endif %}
+      {% for p in range(start, end + 1) %}
+        {% if p == page %}
+          <span class="px-3 py-2 bg-primary text-white rounded-lg font-semibold">{{ p }}</span>
+        {% else %}
+          <a href="{{ url_for('laporan.daftar', page=p, **base_args) }}"
+             class="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50">{{ p }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if end < total_pages %}
+        {% if end < total_pages - 1 %}<span class="px-1 text-gray-400">…</span>{% endif %}
+        <a href="{{ url_for('laporan.daftar', page=total_pages, **base_args) }}"
+           class="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50">{{ total_pages }}</a>
+      {% endif %}
+
+      {% if page < total_pages %}
+        <a href="{{ url_for('laporan.daftar', page=page+1, **base_args) }}"
+           class="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 font-medium">
+          Selanjutnya →
+        </a>
+      {% else %}
+        <span class="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-100 rounded-lg text-gray-300 font-medium cursor-not-allowed">
+          Selanjutnya →
+        </span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
