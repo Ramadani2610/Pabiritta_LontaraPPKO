@@ -45,9 +45,9 @@ async function fetchAndRenderLayers(map) {
   LAYERS.posko = L.layerGroup([
     L.circleMarker([-5.278, 119.495], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
       .bindPopup('<strong>Posko Siaga Desa</strong><br>Balai Desa Lonjoboko<br><a href="tel:08112233445" style="color:#DC2626;font-weight:600;">0811-2233-4455</a>'),
-    L.circleMarker([-5.271, 119.490], { color: '#2563EB', fillColor: '#2563EB', fillOpacity: 0.9, radius: 8 })
+    L.circleMarker([-5.271, 119.490], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
       .bindPopup('<strong>Puskesmas Parangloe</strong><br><a href="tel:08223344556" style="color:#DC2626;font-weight:600;">0822-3344-5566</a>'),
-    L.circleMarker([-5.265, 119.500], { color: '#7C3AED', fillColor: '#7C3AED', fillOpacity: 0.9, radius: 8 })
+    L.circleMarker([-5.265, 119.500], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
       .bindPopup('<strong>BPBD Kab. Gowa</strong><br>Hotline: <a href="tel:112" style="color:#DC2626;font-weight:600;">112</a>'),
   ]);
 
