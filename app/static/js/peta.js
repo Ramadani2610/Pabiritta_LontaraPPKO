@@ -35,7 +35,7 @@ function popupFoto(filename) {
 async function fetchAndRenderLayers(map) {
   // ZONA RAWAN LONGSOR — dari data PWK (GeoJSON, WGS84)
   try {
-    const res = await fetch('/static/data/kelas_rawan_longsor.geojson');
+    const res = await fetch('/static/data/longsorlonjobo_FeaturesToJSO.geojson');
     const gj = await res.json();
 
     const styleKelas = (kelas) => {
