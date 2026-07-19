@@ -38,12 +38,12 @@ async function fetchAndRenderLayers(map) {
     const res = await fetch('/static/data/longsorlonjobo_FeaturesToJSO.geojson');
     const gj = await res.json();
 
-    const styleKelas = (kelas) => {
-      // Palet: Tinggi = merah, Sedang = oranye, Rendah = kuning
-      if (kelas === 'Tinggi') return { color: '#B91C1C', fillColor: '#DC2626', weight: 1, fillOpacity: 0.55 };
-      if (kelas === 'Sedang') return { color: '#C2410C', fillColor: '#F97316', weight: 1, fillOpacity: 0.45 };
-      return                       { color: '#A16207', fillColor: '#EAB308', weight: 1, fillOpacity: 0.35 };
-    };
+const styleKelas = (kelas) => {
+  // Palet: Tinggi = merah, Sedang = oranye, Rendah = kuning
+  if (kelas === 'Tinggi') return { fillColor: '#DC2626', weight: 0, stroke: false, fillOpacity: 0.55 };
+  if (kelas === 'Sedang') return { fillColor: '#F97316', weight: 0, stroke: false, fillOpacity: 0.45 };
+  return                       { fillColor: '#EAB308', weight: 0, stroke: false, fillOpacity: 0.35 };
+};
 
     LAYERS.zona = L.geoJSON(gj, {
       style: (feature) => styleKelas(feature.properties.Kelas),
