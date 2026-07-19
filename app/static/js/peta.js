@@ -2,14 +2,14 @@
  * Pa'Biritta — Peta interaktif Leaflet.
  * Dipakai di Beranda, Dashboard Admin & Super Admin.
  *
- * NOTE: Layer "zona rawan", "kemiringan", "posko", "evakuasi", "titik kumpul"
+ * NOTE: Layer "kemiringan", "posko", "evakuasi", "titik kumpul"
  * masih placeholder (polygon contoh) — bisa diganti GeoJSON resmi nanti.
  */
 
 function initPeta(elementId, opts = {}) {
   const map = L.map(elementId, {
     minZoom: 10,
-  }).setView(opts.center || [-5.275, 119.488], opts.zoom || 13);
+  }).setView(opts.center || [-5.265, 119.735], opts.zoom || 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap',
     maxZoom: 19,
@@ -20,17 +20,48 @@ function initPeta(elementId, opts = {}) {
 /** Layer-layer map yang bisa di-toggle */
 const LAYERS = {};
 
+/**
+ * Helper: bikin blok foto untuk popup.
+ * Kalau foto belum ada, tag <img> otomatis disembunyikan (onerror).
+ * Taruh foto asli di: app/static/img/lokasi/<nama-file>.jpg
+ */
+function popupFoto(filename) {
+  const src = `/static/img/lokasi/${filename}`;
+  return `<img src="${src}" alt=""
+            onerror="this.style.display='none'"
+            style="width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;display:block;">`;
+}
+
 async function fetchAndRenderLayers(map) {
-  // ZONA RAWAN LONGSOR (placeholder polygon)
-  LAYERS.zona = L.layerGroup([
-    L.polygon([
-      [-5.262, 119.475],
-      [-5.258, 119.483],
-      [-5.268, 119.487],
-      [-5.270, 119.478],
-    ], { color: '#DC2626', weight: 2, fillOpacity: 0.25 })
-      .bindPopup('<strong>Zona Rawan Longsor</strong><br>Dusun Galesong'),
-  ]);
+  // ZONA RAWAN LONGSOR — dari data PWK (GeoJSON, WGS84)
+  try {
+    const res = await fetch('/static/data/kelas_rawan_longsor.geojson');
+    const gj = await res.json();
+
+    const styleKelas = (kelas) => {
+      // Palet: Tinggi = merah, Sedang = oranye, Rendah = kuning
+      if (kelas === 'Tinggi') return { color: '#B91C1C', fillColor: '#DC2626', weight: 1, fillOpacity: 0.55 };
+      if (kelas === 'Sedang') return { color: '#C2410C', fillColor: '#F97316', weight: 1, fillOpacity: 0.45 };
+      return                       { color: '#A16207', fillColor: '#EAB308', weight: 1, fillOpacity: 0.35 };
+    };
+
+    LAYERS.zona = L.geoJSON(gj, {
+      style: (feature) => styleKelas(feature.properties.Kelas),
+      onEachFeature: (feature, layer) => {
+        const p = feature.properties || {};
+        layer.bindPopup(`
+          <div style="min-width:160px;">
+            <strong>Zona Rawan Longsor</strong><br>
+            Kelas kerawanan: <b>${p.Kelas || '-'}</b><br>
+            <span style="font-size:11px;color:#6b7280;">Sumber: Data PWK</span>
+          </div>
+        `);
+      },
+    });
+  } catch (e) {
+    console.warn('Gagal load zona rawan longsor:', e);
+    LAYERS.zona = L.layerGroup();
+  }
 
   LAYERS.kemiringan = L.layerGroup([
     L.polygon([
@@ -44,11 +75,27 @@ async function fetchAndRenderLayers(map) {
 
   LAYERS.posko = L.layerGroup([
     L.circleMarker([-5.278, 119.495], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
-      .bindPopup('<strong>Posko Siaga Desa</strong><br>Balai Desa Lonjoboko<br><a href="tel:08112233445" style="color:#DC2626;font-weight:600;">0811-2233-4455</a>'),
+      .bindPopup(`
+        <div style="min-width:200px;">
+          ${popupFoto('posko-balai-desa.jpg')}
+          <strong>Posko Siaga Desa</strong><br>
+          Balai Desa Lonjoboko<br>
+          <a href="tel:08112233445" style="color:#DC2626;font-weight:600;">0811-2233-4455</a>
+        </div>`),
     L.circleMarker([-5.271, 119.490], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
-      .bindPopup('<strong>Puskesmas Parangloe</strong><br><a href="tel:08223344556" style="color:#DC2626;font-weight:600;">0822-3344-5566</a>'),
+      .bindPopup(`
+        <div style="min-width:200px;">
+          ${popupFoto('puskesmas-parangloe.jpg')}
+          <strong>Puskesmas Parangloe</strong><br>
+          <a href="tel:08223344556" style="color:#DC2626;font-weight:600;">0822-3344-5566</a>
+        </div>`),
     L.circleMarker([-5.265, 119.500], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
-      .bindPopup('<strong>BPBD Kab. Gowa</strong><br>Hotline: <a href="tel:112" style="color:#DC2626;font-weight:600;">112</a>'),
+      .bindPopup(`
+        <div style="min-width:200px;">
+          ${popupFoto('bpbd-gowa.jpg')}
+          <strong>BPBD Kab. Gowa</strong><br>
+          Hotline: <a href="tel:112" style="color:#DC2626;font-weight:600;">112</a>
+        </div>`),
   ]);
 
   LAYERS.evakuasi = L.layerGroup([
@@ -59,7 +106,12 @@ async function fetchAndRenderLayers(map) {
 
   LAYERS.kumpul = L.layerGroup([
     L.circleMarker([-5.279, 119.497], { color: '#10B981', fillColor: '#10B981', fillOpacity: 0.9, radius: 8 })
-      .bindPopup('<strong>Titik Kumpul</strong><br>Lapangan Desa'),
+      .bindPopup(`
+        <div style="min-width:200px;">
+          ${popupFoto('titik-kumpul-lapangan.jpg')}
+          <strong>Titik Kumpul</strong><br>
+          Lapangan Desa
+        </div>`),
   ]);
 
   // SENSOR IoT (live)
@@ -85,14 +137,28 @@ async function fetchAndRenderLayers(map) {
     LAYERS.sensor = L.layerGroup();
   }
 
-  // PERSEBARAN TITIK LONGSOR (laporan)
+  // PERSEBARAN TITIK LONGSOR (laporan warga)
   try {
     const res = await fetch('/api/sensor/laporan-titik');
     const data = await res.json();
     const valid = data.filter(l => l.latitude != null && l.longitude != null);
-    const markers = valid.map(l => L.circleMarker([l.latitude, l.longitude], {
-      radius: 7, color: '#2563EB', fillColor: '#2563EB', fillOpacity: 0.8, weight: 2,
-    }).bindPopup(`<strong>${l.lokasi_label}</strong><br>${l.kategori}<br>Status: <b>${l.status}</b><br><a href="/laporan/${l.id}" style="color:#DC2626;font-weight:600;">Lihat Detail →</a>`));
+    const markers = valid.map(l => {
+      const foto = l.foto_url
+        ? `<img src="${l.foto_url}" alt=""
+             style="width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;display:block;">`
+        : '';
+      return L.circleMarker([l.latitude, l.longitude], {
+        radius: 7, color: '#2563EB', fillColor: '#2563EB', fillOpacity: 0.8, weight: 2,
+      }).bindPopup(`
+        <div style="min-width:200px;">
+          ${foto}
+          <strong>${l.lokasi_label}</strong><br>
+          ${l.kategori}<br>
+          Status: <b>${l.status}</b><br>
+          <a href="/laporan/${l.id}" style="color:#DC2626;font-weight:600;">Lihat Detail →</a>
+        </div>
+      `);
+    });
     LAYERS.laporan = L.layerGroup(markers);
   } catch (e) {
     LAYERS.laporan = L.layerGroup();
