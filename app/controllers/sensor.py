@@ -77,7 +77,7 @@ def list_sensors():
 
 @sensor_bp.route("/laporan-titik", methods=["GET"])
 def titik_laporan():
-    """Untuk peta — titik laporan yang sudah tidak menunggu (termasuk Ditolak)."""
+    """Untuk peta — titik laporan yang sudah diverifikasi."""
     from app.models.laporan import Laporan
     items = []
     laporans = Laporan.query.filter(
@@ -91,5 +91,6 @@ def titik_laporan():
             "kategori": l.kategori,
             "lokasi_label": l.lokasi_label or l.dusun,
             "status": l.status,
+            "foto_url": l.foto_url,
         })
     return jsonify(items)
