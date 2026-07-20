@@ -181,9 +181,19 @@
     const lat = parseFloat(el.dataset.lat);
     const lng = parseFloat(el.dataset.lng);
     const label = el.dataset.label;
-    const map = L.map('map-detail').setView([lat, lng], 16);
+    const BOUNDS = L.latLngBounds([-5.300, 119.680], [-5.220, 119.790]);
+    const map = L.map('map-detail', {
+      maxBounds: BOUNDS,
+      maxBoundsViscosity: 1.0,
+      minZoom: 13,
+      maxZoom: 18,
+      scrollWheelZoom: false,
+    }).setView([lat, lng], 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
+      attribution: '© OpenStreetMap',
+      minZoom: 13,
+      maxZoom: 19,
+      bounds: BOUNDS,
     }).addTo(map);
     L.marker([lat, lng]).addTo(map).bindPopup(label).openPopup();
   }
