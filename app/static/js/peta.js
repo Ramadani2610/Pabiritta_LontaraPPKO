@@ -7,13 +7,26 @@
  */
 
 function initPeta(elementId, opts = {}) {
+  // Bounding box sekitar Desa Lonjoboko + Parangloe (padding kecil dari data PWK)
+  const LONJOBOKO_BOUNDS = L.latLngBounds(
+    [-5.300, 119.680],  // sudut barat daya
+    [-5.220, 119.790],  // sudut timur laut
+  );
+
   const map = L.map(elementId, {
-    minZoom: 10,
-  }).setView(opts.center || [-5.265, 119.735], opts.zoom || 13);
+    minZoom: 13,
+    maxZoom: 18,
+    maxBounds: LONJOBOKO_BOUNDS,
+    maxBoundsViscosity: 1.0,  // 1.0 = tidak bisa digeser keluar sama sekali
+  }).setView(opts.center || [-5.263, 119.735], opts.zoom || 14);
+
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap',
+    minZoom: 13,
     maxZoom: 19,
+    bounds: LONJOBOKO_BOUNDS,  // tile hanya di-load di dalam area
   }).addTo(map);
+
   return map;
 }
 
