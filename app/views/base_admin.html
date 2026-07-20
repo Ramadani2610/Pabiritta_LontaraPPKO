@@ -27,11 +27,14 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-gradient-to-b from-primary-dark to-red-900 text-white flex-col overflow-y-auto hidden md:flex">
-    <div class="p-6 border-b border-red-800/50">
-      <div class="flex items-center gap-3">
-        <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo" class="w-12 h-12 object-contain flex-shrink-0">
+    
+    <!-- PERBAIKAN 1: Header Sidebar diberi tinggi tetap h-[104px] agar sejajar dengan header kanan -->
+    <div class="h-[104px] px-6 flex items-center border-b border-red-800/50 box-border">
+      <div class="flex items-center gap-2">
+        <!-- PERBAIKAN 2: Logo diperbesar menjadi w-20 h-20 (80px) -->
+        <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo" class="w-20 h-20 object-contain flex-shrink-0 -ml-2">
         <div>
-          <div class="font-bold text-lg">Pa'<span class="text-red-200">Biritta</span></div>
+          <div class="font-bold text-xl leading-none mb-1">Pa'<span class="text-red-200">Biritta</span></div>
           <div class="text-xs text-red-200">Desa Tangguh Bencana</div>
         </div>
       </div>
@@ -115,7 +118,8 @@
     </header>
 
     <!-- DESKTOP TITLE BAR (hidden on mobile) -->
-    <div class="hidden md:flex items-center justify-between px-8 py-4 bg-white border-b sticky top-0 z-20">
+    <!-- PERBAIKAN 3: Header Kanan diberi tinggi h-[104px] (menggantikan py-4) agar persis sejajar dengan sidebar -->
+    <div class="hidden md:flex items-center justify-between px-8 h-[104px] bg-white border-b sticky top-0 z-20 box-border">
       <div>
         <h1 class="text-2xl font-bold">{{ self.page_title() }}</h1>
         <p class="text-xs text-gray-500 mt-0.5">{% block page_subtitle %}Ringkasan sistem manajemen kebencanaan desa{% endblock %}</p>
