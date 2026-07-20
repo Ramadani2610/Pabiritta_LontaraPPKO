@@ -18,12 +18,13 @@ from app.models.sensor import Sensor, DataSensor
 from app.models.aktivitas import Aktivitas
 
 
-# Koordinat 4 dusun di Desa Lonjoboko, Gowa (perkiraan)
+# Koordinat 4 dusun di Desa Lonjoboko, Parangloe, Gowa (perkiraan,
+# tersebar di dalam bounding box data kerawanan longsor dari PWK)
 DUSUN_KOORDINAT = {
-    "Tombongi": (-5.2701, 119.4785),
-    "Galesong": (-5.2658, 119.4850),
-    "Kampung Beru": (-5.2790, 119.4920),
-    "Bontoloe": (-5.2855, 119.4880),
+    "Tombongi":     (-5.2530, 119.7100),  # barat laut
+    "Galesong":     (-5.2760, 119.7200),  # barat daya
+    "Kampung Beru": (-5.2600, 119.7450),  # tengah-timur
+    "Bontoloe":     (-5.2780, 119.7600),  # tenggara
 }
 
 
