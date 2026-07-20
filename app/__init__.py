@@ -80,6 +80,18 @@ def create_app(config_class=None):
     def server_error(e):
         return render_template("errors/500.html"), 500
 
+    # Jinja filter — strftime cross-platform + nama bulan Bahasa Indonesia.
+    # %-d / %-m tidak jalan di Windows, dan strftime %b/%B tergantung locale OS,
+    # jadi kita render token sendiri dengan mapping tetap ke Bahasa Indonesia.
+    BULAN_PANJANG = [
+        "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+    ]
+    BULAN_SINGKAT = [
+        "", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+        "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+    ]
+
     @app.template_filter("tgl")
     def _tgl_filter(value, fmt="%d %b %Y"):
         if value is None:
@@ -94,10 +106,11 @@ def create_app(config_class=None):
             "%H": f"{value.hour:02d}",
             "%M": f"{value.minute:02d}",
             "%S": f"{value.second:02d}",
-            "%b": value.strftime("%b"),
-            "%B": value.strftime("%B"),
+            "%b": BULAN_SINGKAT[value.month],
+            "%B": BULAN_PANJANG[value.month],
         }
         out = fmt
+        # Urutan: token yang lebih panjang dulu (%-d sebelum %d)
         for k in sorted(token_map.keys(), key=len, reverse=True):
             out = out.replace(k, token_map[k])
         return out
