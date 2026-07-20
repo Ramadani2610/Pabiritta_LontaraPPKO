@@ -26,7 +26,8 @@
 
 <!-- NAVBAR -->
 <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- UBAH: max-w-7xl menjadi max-w-[96%] -->
+  <div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <a href="{{ url_for('public.beranda') }}" class="flex items-center -ml-4">
         <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo Pa'Biritta" class="w-[88px] h-[88px] object-contain rounded-full">
@@ -73,7 +74,8 @@
 <!-- FLASH MESSAGES -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-2">
+    <!-- UBAH: max-w-7xl menjadi max-w-[96%] -->
+    <div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-2">
       {% for category, msg in messages %}
         {% set cls = {'success':'bg-green-50 text-green-800 border-green-200','error':'bg-red-50 text-red-800 border-red-200','warning':'bg-yellow-50 text-yellow-800 border-yellow-200'}.get(category,'bg-blue-50 text-blue-800 border-blue-200') %}
         <div class="border rounded-lg px-4 py-3 text-sm {{ cls }}">{{ msg }}</div>
@@ -88,14 +90,13 @@
 
 <!-- FOOTER -->
 <footer class="bg-gray-900 text-gray-300 mt-12">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+  <!-- UBAH: max-w-7xl menjadi max-w-[96%] -->
+  <div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
     <div>
-      <!-- Ditarik lebih ke atas dengan mengubah -mt-6 menjadi -mt-10 -->
       <div class="flex items-center -mt-10">
         <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo Pa'Biritta" class="w-[136px] h-[136px] object-contain rounded-full -ml-9 z-0">
         <span class="font-bold text-xl text-white -ml-6 z-10">Pa'<span class="text-primary">Biritta</span></span>
       </div>
-      <!-- Ditarik lebih ke atas dengan mengubah -mt-4 menjadi -mt-6 agar paragraf menyusul gambar -->
       <p class="text-sm text-gray-400 -mt-6">Sistem Manajemen Bencana Desa berbasis komunitas untuk mitigasi, pemantauan, dan pelaporan potensi bencana longsor.</p>
     </div>
     <div>
@@ -128,7 +129,8 @@
     </div>
   </div>
   <div class="border-t border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500">
+    <!-- UBAH: max-w-7xl menjadi max-w-[96%] -->
+    <div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500">
       <p>© 2026 Kelompok Tangguh Bencana. Hak Cipta Dilindungi.</p>
       <div class="flex gap-4 mt-2 sm:mt-0">
         <a href="#" class="hover:text-primary">Syarat &amp; Ketentuan</a>

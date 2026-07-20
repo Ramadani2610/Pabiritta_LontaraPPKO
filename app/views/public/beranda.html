@@ -2,7 +2,7 @@
 {% block title %}Beranda{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+<div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
   <!-- HERO -->
   <div class="relative bg-gradient-to-l from-red-800 via-red-700 to-red-500 rounded-2xl overflow-hidden p-6 sm:p-10 text-white">
@@ -17,8 +17,11 @@
         Buat Laporan
       </a>
     </div>
-    <div class="absolute -right-10 -bottom-10 opacity-20 pointer-events-none">
-      <svg class="w-72 h-72" fill="white" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+    <div class="absolute -right-4 -bottom-32 opacity-20 pointer-events-none">
+      <!-- PERBAIKAN: Koordinat SVG path (huruf M bagian kedua) dimodifikasi untuk menaikkan tanda seru secara presisi -->
+      <svg class="w-[400px] h-[400px]" fill="currentColor" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 6.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V7a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+      </svg>
     </div>
   </div>
 
@@ -86,13 +89,13 @@
         <div>
           <div class="font-semibold mb-2">Layer</div>
           <div class="space-y-2 text-xs">
-            <label class="flex items-center gap-2"><input type="checkbox" data-layer="zona" class="rounded text-primary" checked> Zona Rawan Longsor</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-layer="sensor" class="rounded text-primary" checked> Sensor IoT</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-layer="posko" class="rounded text-primary"> Posko Siaga Bencana</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-layer="laporan" class="rounded text-primary" checked> Persebaran titik longsor</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-layer="kemiringan" class="rounded text-primary"> Zona kemiringan lereng</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-layer="evakuasi" class="rounded text-primary"> Jalur evakuasi</label>
-            <label class="flex items-center gap-2"><input type="checkbox" data-layer="kumpul" class="rounded text-primary"> Titik Kumpul</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-layer="zona" class="rounded accent-red-700 w-4 h-4 cursor-pointer" checked> Zona Rawan Longsor</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-layer="sensor" class="rounded accent-red-700 w-4 h-4 cursor-pointer" checked> Sensor IoT</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-layer="posko" class="rounded accent-red-700 w-4 h-4 cursor-pointer"> Posko Siaga Bencana</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-layer="laporan" class="rounded accent-red-700 w-4 h-4 cursor-pointer" checked> Persebaran titik longsor</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-layer="kemiringan" class="rounded accent-red-700 w-4 h-4 cursor-pointer"> Zona kemiringan lereng</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-layer="evakuasi" class="rounded accent-red-700 w-4 h-4 cursor-pointer"> Jalur evakuasi</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-layer="kumpul" class="rounded accent-red-700 w-4 h-4 cursor-pointer"> Titik Kumpul</label>
           </div>
         </div>
       </div>
@@ -155,7 +158,9 @@
       <!-- Kontak Darurat -->
       <div class="bg-gray-900 rounded-xl p-6 text-white">
         <div class="flex items-center gap-2 mb-4">
-          <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92z"/></svg>
+          <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5z" clip-rule="evenodd" />
+          </svg>
           <h2 class="font-bold">Kontak Darurat</h2>
         </div>
         <ul class="space-y-3 text-sm">
