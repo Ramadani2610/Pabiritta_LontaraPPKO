@@ -65,16 +65,16 @@ const styleKelas = (kelas) => {
 
   LAYERS.kemiringan = L.layerGroup([
     L.polygon([
-      [-5.286, 119.487],
-      [-5.282, 119.499],
-      [-5.293, 119.503],
-      [-5.297, 119.491],
+      [-5.258, 119.715],
+      [-5.258, 119.728],
+      [-5.268, 119.730],
+      [-5.270, 119.717],
     ], { color: '#F97316', weight: 2, fillOpacity: 0.2 })
-      .bindPopup('<strong>Zona Kemiringan Lereng</strong>'),
+      .bindPopup('<strong>Zona Kemiringan Lereng</strong><br>Lereng curam sekitar Desa Lonjoboko'),
   ]);
 
   LAYERS.posko = L.layerGroup([
-    L.circleMarker([-5.278, 119.495], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
+    L.circleMarker([-5.260, 119.722], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
       .bindPopup(`
         <div style="min-width:200px;">
           ${popupFoto('posko-balai-desa.jpg')}
@@ -82,35 +82,47 @@ const styleKelas = (kelas) => {
           Balai Desa Lonjoboko<br>
           <a href="tel:08112233445" style="color:#DC2626;font-weight:600;">0811-2233-4455</a>
         </div>`),
-    L.circleMarker([-5.271, 119.490], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
+    L.circleMarker([-5.253, 119.748], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
       .bindPopup(`
         <div style="min-width:200px;">
           ${popupFoto('puskesmas-parangloe.jpg')}
           <strong>Puskesmas Parangloe</strong><br>
           <a href="tel:08223344556" style="color:#DC2626;font-weight:600;">0822-3344-5566</a>
         </div>`),
-    L.circleMarker([-5.265, 119.500], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
+    L.circleMarker([-5.275, 119.760], { color: '#16A34A', fillColor: '#16A34A', fillOpacity: 0.9, radius: 8 })
       .bindPopup(`
         <div style="min-width:200px;">
           ${popupFoto('bpbd-gowa.jpg')}
-          <strong>BPBD Kab. Gowa</strong><br>
+          <strong>Pos BPBD Kab. Gowa</strong><br>
           Hotline: <a href="tel:112" style="color:#DC2626;font-weight:600;">112</a>
         </div>`),
   ]);
 
   LAYERS.evakuasi = L.layerGroup([
-    L.polyline([[-5.265, 119.482], [-5.270, 119.488], [-5.278, 119.495]],
+    L.polyline(
+      [[-5.268, 119.720], [-5.263, 119.728], [-5.258, 119.738], [-5.255, 119.748]],
       { color: '#374151', weight: 4, dashArray: '6, 8' })
-      .bindPopup('<strong>Jalur Evakuasi</strong>'),
+      .bindPopup('<strong>Jalur Evakuasi</strong><br>Menuju titik kumpul dan puskesmas'),
+    L.polyline(
+      [[-5.272, 119.750], [-5.268, 119.755], [-5.263, 119.755]],
+      { color: '#374151', weight: 4, dashArray: '6, 8' })
+      .bindPopup('<strong>Jalur Evakuasi</strong><br>Menuju pos BPBD'),
   ]);
 
   LAYERS.kumpul = L.layerGroup([
-    L.circleMarker([-5.279, 119.497], { color: '#10B981', fillColor: '#10B981', fillOpacity: 0.9, radius: 8 })
+    L.circleMarker([-5.255, 119.746], { color: '#10B981', fillColor: '#10B981', fillOpacity: 0.9, radius: 8 })
       .bindPopup(`
         <div style="min-width:200px;">
           ${popupFoto('titik-kumpul-lapangan.jpg')}
-          <strong>Titik Kumpul</strong><br>
-          Lapangan Desa
+          <strong>Titik Kumpul Utama</strong><br>
+          Lapangan Desa Parangloe
+        </div>`),
+    L.circleMarker([-5.263, 119.720], { color: '#10B981', fillColor: '#10B981', fillOpacity: 0.9, radius: 8 })
+      .bindPopup(`
+        <div style="min-width:200px;">
+          ${popupFoto('titik-kumpul-balai.jpg')}
+          <strong>Titik Kumpul Cadangan</strong><br>
+          Halaman Balai Desa Lonjoboko
         </div>`),
   ]);
 
