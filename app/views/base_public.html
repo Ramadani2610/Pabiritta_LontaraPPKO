@@ -22,11 +22,10 @@
       }
     </script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col relative">
 
 <!-- NAVBAR -->
-<nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
-  <!-- UBAH: max-w-7xl menjadi max-w-[96%] -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 relative">
   <div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <a href="{{ url_for('public.beranda') }}" class="flex items-center -ml-4">
@@ -51,30 +50,32 @@
       </div>
 
       <!-- Mobile menu button -->
-      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100" aria-label="Menu">
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-600 hover:bg-red-50 hover:text-primary transition-colors relative z-50" aria-label="Menu">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
     </div>
+  </div>
 
-    <!-- Mobile menu -->
-    <div id="mobile-menu" class="hidden md:hidden pb-4 space-y-2">
-      <a href="{{ url_for('public.beranda') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Beranda</a>
-      <a href="{{ url_for('laporan.buat') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Buat Laporan</a>
-      <a href="{{ url_for('laporan.daftar') }}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Laporan Warga</a>
-      <div class="border-t border-gray-200 pt-2 mt-1">
-        <a href="{{ url_for('auth.login') }}" class="flex items-center gap-2 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 font-medium">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-          Login Admin
-        </a>
-      </div>
+  <!-- PERBAIKAN: Ditambahkan rounded-b-2xl agar ujung bawahnya melengkung -->
+  <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 shadow-md px-6 py-4 z-50 space-y-2 rounded-b-2xl">
+    <a href="{{ url_for('public.beranda') }}" class="block px-4 py-3 rounded-lg text-base text-gray-700 hover:bg-red-50 hover:text-primary transition-colors">Beranda</a>
+    <a href="{{ url_for('laporan.buat') }}" class="block px-4 py-3 rounded-lg text-base text-gray-700 hover:bg-red-50 hover:text-primary transition-colors">Buat Laporan</a>
+    <a href="{{ url_for('laporan.daftar') }}" class="block px-4 py-3 rounded-lg text-base text-gray-700 hover:bg-red-50 hover:text-primary transition-colors">Laporan Warga</a>
+    <div class="border-t border-gray-100 pt-3 mt-3">
+      <a href="{{ url_for('auth.login') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-base text-gray-700 hover:bg-red-50 hover:text-primary font-medium transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+        Login Admin
+      </a>
     </div>
   </div>
 </nav>
 
+<!-- Overlay Blur untuk seluruh halaman -->
+<div id="mobile-overlay" class="hidden md:hidden fixed inset-0 top-16 bg-black/20 backdrop-blur-sm z-40 transition-opacity"></div>
+
 <!-- FLASH MESSAGES -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    <!-- UBAH: max-w-7xl menjadi max-w-[96%] -->
     <div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-2">
       {% for category, msg in messages %}
         {% set cls = {'success':'bg-green-50 text-green-800 border-green-200','error':'bg-red-50 text-red-800 border-red-200','warning':'bg-yellow-50 text-yellow-800 border-yellow-200'}.get(category,'bg-blue-50 text-blue-800 border-blue-200') %}
@@ -90,7 +91,6 @@
 
 <!-- FOOTER -->
 <footer class="bg-gray-900 text-gray-300 mt-12">
-  <!-- UBAH: max-w-7xl menjadi max-w-[96%] -->
   <div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
     <div>
       <div class="flex items-center -mt-10">
@@ -129,7 +129,6 @@
     </div>
   </div>
   <div class="border-t border-gray-800">
-    <!-- UBAH: max-w-7xl menjadi max-w-[96%] -->
     <div class="max-w-[96%] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500">
       <p>© 2026 Kelompok Tangguh Bencana. Hak Cipta Dilindungi.</p>
       <div class="flex gap-4 mt-2 sm:mt-0">
@@ -141,9 +140,37 @@
 </footer>
 
 <script>
-  document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
-    document.getElementById('mobile-menu').classList.toggle('hidden');
-  });
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('mobile-overlay');
+
+  function toggleMenu() {
+    const isHidden = menu.classList.contains('hidden');
+    
+    if (isHidden) {
+      // Buka Menu & Overlay, Kunci Scroll
+      menu.classList.remove('hidden');
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      
+      // Ubah gaya tombol hamburger agar terlihat aktif
+      btn.classList.add('bg-red-50', 'text-primary');
+      btn.classList.remove('text-gray-600');
+    } else {
+      // Tutup Menu & Overlay, Lepas Scroll
+      menu.classList.add('hidden');
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+      
+      // Kembalikan gaya tombol hamburger
+      btn.classList.remove('bg-red-50', 'text-primary');
+      btn.classList.add('text-gray-600');
+    }
+  }
+
+  // Event Listeners
+  btn?.addEventListener('click', toggleMenu);
+  overlay?.addEventListener('click', toggleMenu); // Menutup menu jika area blur ditekan
 </script>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
