@@ -27,21 +27,18 @@
 
   <!-- SIDEBAR -->
   <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-gradient-to-b from-primary-dark to-red-900 text-white flex-col overflow-y-auto hidden md:flex">
-    
-    <!-- PERBAIKAN 1: Header Sidebar diberi tinggi tetap h-[104px] agar sejajar dengan header kanan -->
-    <div class="h-[104px] px-6 flex items-center border-b border-red-800/50 box-border">
-      <div class="flex items-center gap-2">
-        <!-- PERBAIKAN 2: Logo diperbesar menjadi w-20 h-20 (80px) -->
-        <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo" class="w-20 h-20 object-contain flex-shrink-0 -ml-2">
-        <div>
-          <div class="font-bold text-xl leading-none mb-1">Pa'<span class="text-red-200">Biritta</span></div>
-          <div class="text-xs text-red-200">Desa Tangguh Bencana</div>
+    <div class="px-5 py-4 border-b border-red-800/50">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='img/logo-lontara.png') }}" alt="Logo" class="w-20 h-20 object-contain flex-shrink-0">
+        <div class="min-w-0">
+          <div class="font-bold text-2xl leading-tight">Pa'<span class="text-red-200">Biritta</span></div>
+          <div class="text-xs text-red-200 mt-1">Desa Tangguh Bencana</div>
         </div>
       </div>
     </div>
 
-    <nav class="flex-1 p-4 space-y-1">
-      <div class="text-xs uppercase text-red-200/70 px-3 py-2">Menu Utama</div>
+    <nav class="flex-1 px-4 pt-3 pb-4 space-y-1">
+      <div class="text-xs uppercase text-red-200/70 px-3 py-1.5 tracking-wider">Menu Utama</div>
       {% set ep = request.endpoint %}
       <a href="{{ url_for('admin.dashboard') }}"
          class="flex items-center gap-3 px-3 py-2.5 rounded-lg {% if ep == 'admin.dashboard' %}bg-primary{% else %}hover:bg-red-800/50{% endif %}">
@@ -67,7 +64,7 @@
       {% endif %}
     </nav>
 
-    <div class="p-4 border-t border-red-800/50 space-y-3">
+    <div class="px-4 py-3 border-t border-red-800/50 space-y-2">
       <!-- User info (desktop only, since header is hidden on md+) -->
       <div class="flex items-center gap-3 px-2 py-2 rounded-lg bg-white/10">
         <div class="w-9 h-9 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
@@ -98,7 +95,7 @@
   <div class="flex-1 flex flex-col min-w-0 md:ml-72">
 
     <!-- MOBILE HEADER (hidden on desktop) -->
-    <header class="md:hidden bg-white border-b border-gray-200 sticky top-0 z-30">
+    <header class="md:hidden bg-white border-b border-gray-200 sticky top-0 z-10">
       <div class="px-4 h-16 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <button id="sidebar-toggle" class="p-2 rounded-md text-gray-600 hover:bg-gray-100">
