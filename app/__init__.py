@@ -74,7 +74,7 @@ def create_app(config_class=None):
     def too_large(e):
         from flask import flash, redirect, request
         flash(f"Ukuran file melebihi batas {app.config['MAX_UPLOAD_MB']}MB.", "error")
-        return redirect(request.referrer or "/"), 413
+        return redirect(request.referrer or "/")
 
     @app.errorhandler(500)
     def server_error(e):
